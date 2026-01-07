@@ -1,12 +1,15 @@
 from flask import Flask, request, jsonify
 import os
+import tempfile
+import base64
 import smtplib
 from email.message import EmailMessage
 
-from rapport_couple import rapport_couple, render_rapport_html
+from rapport_couple import rapport_couple, generate_pdf
 
 app = Flask(__name__)
 
+# Variables d'environnement Gmail
 GMAIL_USER = os.environ.get("GMAIL_USER")
 GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD")
 
@@ -21,32 +24,48 @@ def send_report():
     nom_b, date_b = data["nom_b"], data["date_b"]
     recipient = data["email"]
 
-    # Génération du rapport
-    rapport = rapport_couple(nom_a, date_a, nom_b, date_b)
-    html_content = render_rapport_html(rapport)
+    # Générer PDF temporaire
+    with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmpfile:
+        pdf_file = tmpfile.name
 
+    rapport = rapport_couple(nom_a, date_a, nom_b, date_b)
+    generate_pdf(rapport, pdf_file)
+
+    # Lire le PDF
+    with open(pdf_file, "rb") as f:
+        pdf_data = f.read()
+
+    # Construire l'email
     msg = EmailMessage()
     msg["From"] = GMAIL_USER
     msg["To"] = recipient
-    msg["Subject"] = f"Rapport Numérologique : {rapport['noms']}"
+    msg["Subject"] = f"Rapport Numérologique : {nom_a} & {nom_b}"
 
-    # Fallback texte
     msg.set_content(
-        f"Bonjour,\n\n"
-        f"Voici votre rapport numérologique de couple.\n\n"
-        f"Score : {rapport['score_compatibilite']}/100\n\n"
-        f"{rapport['synthese']}"
+        f"""
+Bonjour,
+
+Veuillez trouver en pièce jointe le rapport numérologique
+pour {nom_a} et {nom_b}.
+
+Cordialement.
+"""
     )
 
-    # Version HTML
-    msg.add_alternative(html_content, subtype="html")
+    msg.add_attachment(
+        pdf_data,
+        maintype="application",
+        subtype="pdf",
+        filename="rapport_couple.pdf"
+    )
 
+    # Envoi via Gmail SMTP
     try:
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
             server.login(GMAIL_USER, GMAIL_APP_PASSWORD)
             server.send_message(msg)
 
-        return jsonify({"status": "success", "delivery": "gmail_html"}), 200
+        return jsonify({"status": "success", "provider": "gmail"}), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
