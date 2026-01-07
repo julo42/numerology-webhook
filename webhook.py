@@ -7,7 +7,7 @@ from rapport_couple import rapport_couple, render_rapport_html
 
 app = Flask(__name__)
 
-GMAIL_USER = os.environ.get("GMAIL_USER")
+GMAIL_USER = os.environ.get("SENDER_EMAIL")
 GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD")
 
 @app.route("/send_report", methods=["POST"])
