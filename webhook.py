@@ -30,9 +30,6 @@ def send_report():
             if k2 in contact["fields"]:
                 data[k1] = contact["fields"][k2]
 
-    print("Données systeme.io:", request.json)
-    print("Données formatées:", data)
-
     for field in ["nom_a", "date_a", "nom_b", "date_b", "email"]:
         if field not in data:
             return jsonify({"error": f"Missing field: {field}"}), 400

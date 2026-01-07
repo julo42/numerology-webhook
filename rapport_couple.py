@@ -1,6 +1,3 @@
-from reportlab.lib.pagesizes import A4
-from reportlab.pdfgen import canvas
-from reportlab.lib.units import cm
 from datetime import datetime
 
 # ------------------------
@@ -51,67 +48,6 @@ def recommandations(cv1, cv2):
     if 7 in (cv1, cv2):
         recs.append("Partager des activités intellectuelles ou spirituelles.")
     return recs[:5]
-
-# ------------------------
-# Génération du rapport PDF
-# ------------------------
-def generate_pdf(rapport, filename="rapport_couple.pdf"):
-    c = canvas.Canvas(filename, pagesize=A4)
-    width, height = A4
-    y = height - 2*cm
-
-    c.setFont("Helvetica-Bold", 18)
-    c.drawString(2*cm, y, f"Rapport Numérologique de Couple")
-    y -= 1*cm
-
-    c.setFont("Helvetica", 12)
-    c.drawString(2*cm, y, f"Couple: {rapport['noms']}")
-    y -= 0.8*cm
-
-    # Chemins de vie
-    c.setFont("Helvetica-Bold", 14)
-    c.drawString(2*cm, y, "Chemins de vie:")
-    y -= 0.6*cm
-    c.setFont("Helvetica", 12)
-    for nom, cv in rapport["chemin_de_vie"].items():
-        c.drawString(3*cm, y, f"{nom}: {cv}")
-        y -= 0.5*cm
-
-    # Score
-    c.setFont("Helvetica-Bold", 14)
-    c.drawString(2*cm, y, f"Score de compatibilité: {rapport['score_compatibilite']}/100")
-    y -= 0.8*cm
-
-    # Axes relationnels
-    c.setFont("Helvetica-Bold", 14)
-    c.drawString(2*cm, y, "Axes relationnels:")
-    y -= 0.6*cm
-    c.setFont("Helvetica", 12)
-    for key, val in rapport["axes_relationnels"].items():
-        c.drawString(3*cm, y, f"{key.capitalize()}: {val}")
-        y -= 0.5*cm
-
-    # Synthèse
-    y -= 0.3*cm
-    c.setFont("Helvetica-Bold", 14)
-    c.drawString(2*cm, y, "Synthèse:")
-    y -= 0.6*cm
-    c.setFont("Helvetica", 12)
-    c.drawString(3*cm, y, rapport["synthese"])
-    y -= 1*cm
-
-    # Recommandations
-    c.setFont("Helvetica-Bold", 14)
-    c.drawString(2*cm, y, "Recommandations pratiques:")
-    y -= 0.6*cm
-    c.setFont("Helvetica", 12)
-    for idx, rec in enumerate(rapport["recommandations"], 1):
-        c.drawString(3*cm, y, f"{idx}. {rec}")
-        y -= 0.5*cm
-
-    c.showPage()
-    c.save()
-    print(f"PDF généré: {filename}")
 
 def render_rapport_html(rapport):
     chemins = "".join(
@@ -195,15 +131,3 @@ def rapport_couple(nom_a, date_a, nom_b, date_b):
         "synthese": synthese
     }
     return rapport
-
-# ------------------------
-# Exemple d'utilisation
-# ------------------------
-if __name__ == "__main__":
-    nom_a = "Esther"
-    date_a = "1978-04-12"
-    nom_b = "Julien"
-    date_b = "1980-11-30"
-
-    r = rapport_couple(nom_a, date_a, nom_b, date_b)
-    generate_pdf(r, filename="rapport_couple.pdf")
