@@ -113,6 +113,68 @@ def generate_pdf(rapport, filename="rapport_couple.pdf"):
     c.save()
     print(f"PDF généré: {filename}")
 
+def render_rapport_html(rapport):
+    chemins = "".join(
+        f"<li><strong>{nom}</strong> : {cv}</li>"
+        for nom, cv in rapport["chemin_de_vie"].items()
+    )
+
+    axes = "".join(
+        f"<li><strong>{k.capitalize()}</strong> : {v}</li>"
+        for k, v in rapport["axes_relationnels"].items()
+    )
+
+    recommandations = "".join(
+        f"<li>{rec}</li>"
+        for rec in rapport["recommandations"]
+    )
+
+    return f"""
+    <html>
+      <body style="font-family: Arial, sans-serif; background:#f6f6f6; padding:20px;">
+        <div style="max-width:600px; background:#ffffff; margin:auto; padding:20px; border-radius:8px;">
+
+          <h1 style="text-align:center;">Rapport Numérologique de Couple</h1>
+          <p style="text-align:center; font-size:18px;">
+            <strong>{rapport["noms"]}</strong>
+          </p>
+
+          <hr>
+
+          <h2>🔢 Chemins de vie</h2>
+          <ul>
+            {chemins}
+          </ul>
+
+          <h2>❤️ Score de compatibilité</h2>
+          <p style="font-size:20px;">
+            <strong>{rapport["score_compatibilite"]} / 100</strong>
+          </p>
+
+          <h2>⚖️ Axes relationnels</h2>
+          <ul>
+            {axes}
+          </ul>
+
+          <h2>🧠 Synthèse</h2>
+          <p>{rapport["synthese"]}</p>
+
+          <h2>✅ Recommandations pratiques</h2>
+          <ul>
+            {recommandations}
+          </ul>
+
+          <hr>
+
+          <p style="font-size:12px; color:#777; text-align:center;">
+            Rapport généré automatiquement – Numérologie
+          </p>
+
+        </div>
+      </body>
+    </html>
+    """
+
 # ------------------------
 # Rapport complet
 # ------------------------
