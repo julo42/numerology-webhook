@@ -12,12 +12,27 @@ GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD")
 
 @app.route("/send_report", methods=["POST"])
 def send_report():
-    print("Headers:", request.headers)  # pour voir le type de contenu
-    print("Body brut:", request.data)   # le body tel qu'il arrive
-    print("Form data:", request.form)   # si c'est x-www-form-urlencoded
-    print("JSON data:", request.json)   # si c'est application/json
+    systeme_io_data = request.json
 
-    data = request.json
+    # Transfert des champs "systeme.io" vers "data".
+    fields = {
+        "nom_a": "first_name",
+        "date_a": "date_de_naissance",
+        "nom_b": "prnom_conjoint",
+        "date_b": "date_de_naissance_conjoint"
+    )
+    data = {}
+    contact = systeme_io_data.get("data", {}).get("contact", {})
+    if "email" in contact:
+        data["email"] = contact["email"]
+    if "fields" in contact:
+        for k1, k2 in fields.items():
+            if k2 in contact["fields"]:
+                data[k1] = contact["fields"][k2]
+
+    print("Données systeme.io:", request.json)
+    print("Données formatées:", data)
+
     for field in ["nom_a", "date_a", "nom_b", "date_b", "email"]:
         if field not in data:
             return jsonify({"error": f"Missing field: {field}"}), 400
