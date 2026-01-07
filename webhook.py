@@ -12,6 +12,11 @@ GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD")
 
 @app.route("/send_report", methods=["POST"])
 def send_report():
+    print("Headers:", request.headers)  # pour voir le type de contenu
+    print("Body brut:", request.data)   # le body tel qu'il arrive
+    print("Form data:", request.form)   # si c'est x-www-form-urlencoded
+    print("JSON data:", request.json)   # si c'est application/json
+
     data = request.json
     for field in ["nom_a", "date_a", "nom_b", "date_b", "email"]:
         if field not in data:
