@@ -20,7 +20,7 @@ def send_report():
         "date_a": "date_de_naissance",
         "nom_b": "prnom_conjoint",
         "date_b": "date_de_naissance_conjoint"
-    )
+    }
     data = {}
     contact = systeme_io_data.get("data", {}).get("contact", {})
     if "email" in contact:
