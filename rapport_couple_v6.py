@@ -1,6 +1,7 @@
 from datetime import datetime
 import webbrowser
 
+
 # ------------------------
 # Constantes
 # ------------------------
@@ -130,23 +131,13 @@ def interpretation(score, short=False):
 # Outils dates & numérologie
 # ------------------------
 
-def parse_date(date_str):
-    if "-" in date_str:
-        dt = datetime.strptime(date_str, "%Y-%m-%d")
-    elif "/" in date_str:
-        dt = datetime.strptime(date_str, "%d/%m/%Y")
-    else:
-        raise ValueError("Format de date invalide")
-    return dt.strftime("%Y-%m-%d")
-
 def reduction_numerologique(n):
     while n > 9 and n not in MASTER_NUMBERS:
         n = sum(int(c) for c in str(n))
     return n
 
 def chemin_de_vie(date_str):
-    date_norm = parse_date(date_str)
-    total = sum(int(c) for c in date_norm if c.isdigit())
+    total = sum(int(c) for c in date_str if c.isdigit())
     return reduction_numerologique(total)
 
 # ------------------------
@@ -205,7 +196,7 @@ def rapport_couple(nom_a, date_a, nom_b, date_b):
     # Synthèse phrases complètes
     forces_phrase = FORCES_PHRASES.get(compat["forces"], compat["forces"])
     tension_phrase = TENSION_PHRASES.get(compat["tension_key"], "la nécessité d’ajustements mutuels conscients")
-    leviers_phrase = LEVIERS_PHRASES.get(compat["leviers"], compat["leviers"])
+    leviers_phrase = LEVIERS_PHRASES.get(compat["leviers"], "maintenir une communication consciente")
 
     synthese = (
         f"{nom_a} et {nom_b} présentent une compatibilité globale de {score}/100. "
@@ -216,7 +207,7 @@ def rapport_couple(nom_a, date_a, nom_b, date_b):
 
     return {
         "noms": f"{nom_a} & {nom_b}",
-        "chemin_de_vie": {nom_a: cv1, nom_b: cv2},
+        "chemin_de_vie": {nom_a: date_a, nom_b: date_b},
         "score_compatibilite": score,
         "interpretation": interpretation(score),
         "axes_relationnels": compat,  # termes courts pour le tableau
@@ -229,48 +220,124 @@ def rapport_couple(nom_a, date_a, nom_b, date_b):
 # ------------------------
 
 def render_rapport_html(rapport):
-    chemins = "".join(
-        f"<li><strong>{nom}</strong> : {cv}</li>"
-        for nom, cv in rapport["chemin_de_vie"].items()
-    )
+    noms = rapport['noms']
+    cv_dict = rapport['chemin_de_vie']
+    score = rapport['score_compatibilite']
+    synthese = rapport['synthese']
 
-    recommandations_html = "".join(
-        f"<li>{rec}</li>" for rec in rapport["recommandations"]
-    )
+    nom_a, nom_b = list(cv_dict.keys())
+    date_a, date_b = cv_dict[nom_a], cv_dict[nom_b]
 
-    # Tensions courtes pour le tableau
-    tension_table = TENSION_SHORT.get(
-        rapport['axes_relationnels'].get("tension_key","ajustements"),
-        "Ajustements nécessaires"
-    )
+    # Profils individuels (texte narratif)
+    def profil_html(nom, cv):
+        if cv in [1, 3, 5]:
+            energie = "Énergie créative, communicative, adaptable."
+            besoins = "Besoin de liberté, de mouvement, de variété, et de stimulation intellectuelle."
+            traits = "Esprit vif, expressif, ouvert."
+        elif cv in [2, 4, 6]:
+            energie = "Énergie intuitive, profonde, sensible."
+            besoins = "Besoin d’authenticité, de stabilité affective, de compréhension émotionnelle et d’ancrage."
+            traits = "Personnalité tournée vers la sagesse intérieure."
+        elif cv in [7, 8, 9, 11, 22, 33]:
+            energie = "Énergie analytique et structurante, réfléchie et stratégique."
+            besoins = "Besoin de clarté, d’organisation et d’épanouissement personnel."
+            traits = "Esprit réfléchi, autonome, parfois intense."
+        else:
+            energie = "Énergie équilibrée et neutre."
+            besoins = "Besoin de stabilité et de relations harmonieuses."
+            traits = "Personnalité standard."
+        return f"<p>{energie} {besoins} {traits}</p>"
 
-    return f"""
+    profil_a_html = profil_html(nom_a, date_a)
+    profil_b_html = profil_html(nom_b, date_b)
+
+    # Axes relationnels
+    compat = rapport['axes_relationnels']
+    forces_phrase = FORCES_PHRASES.get(compat["forces"], compat["forces"])
+    tension_phrase = TENSION_PHRASES.get(compat["tension_key"], "ajustements nécessaires")
+    leviers_phrase = LEVIERS_PHRASES.get(compat["leviers"], "communication consciente")
+
+    html = f"""
 <html>
-<body style="font-family:Arial;background:#f6f6f6;padding:20px;">
-<div style="max-width:600px;margin:auto;background:#fff;padding:20px;border-radius:8px;">
-<h1 style="text-align:center;">Rapport Numérologique de Couple</h1>
+<head><meta charset="utf-8"><title>Rapport Numérologique de Couple</title></head>
+<body style="font-family:Arial,sans-serif;background:#f6f6f6;padding:20px;">
+<div style="max-width:700px;margin:auto;background:#fff;padding:20px;border-radius:8px;">
+<h1 style="text-align:center;">NUMÉROLOGIE DE COUPLE</h1>
+<p style="text-align:center;font-size:18px;"><strong>{noms}</strong></p>
 
-<p style="text-align:center;font-size:18px;"><strong>{rapport['noms']}</strong></p>
-
-<h2>🔢 Chemins de vie</h2>
-<ul>{chemins}</ul>
-
-<h2>❤️ Compatibilité</h2>
-<p style="font-size:22px;color:#2c7;"><strong>{rapport['score_compatibilite']} / 100</strong></p>
-<p>{interpretation(rapport['score_compatibilite'], short=True)}</p>
-
-<h2>⚖️ Axes relationnels</h2>
+<p>Cette étude complète explore la dynamique profonde du couple grâce à une analyse numérologique fondée sur les dates de naissance :</p>
 <ul>
-<li><strong>Forces</strong> : {rapport['axes_relationnels']['forces']}</li>
-<li><strong>Tensions</strong> : {tension_table}</li>
-<li><strong>Leviers</strong> : {rapport['axes_relationnels']['leviers']}</li>
+<li>{nom_a} : {date_a}</li>
+<li>{nom_b} : {date_b}</li>
+</ul>
+<p>Elle couvre : les profils individuels, l’énergie commune, la communication, l’intimité, l’influence mutuelle, les forces, les défis et les chemins d’harmonisation.</p>
+
+<h2>Profils Individuels</h2>
+<h3>{nom_a} ({date_a})</h3>{profil_a_html}
+<h3>{nom_b} ({date_b})</h3>{profil_b_html}
+
+<h2>Énergie Fondamentale du Couple</h2>
+<p>Ensemble, leurs vibrations créent une dynamique fondée sur :</p>
+<ul>
+<li>la complémentarité entre {nom_a} et {nom_b} ;</li>
+<li>une capacité à équilibrer réflexion intérieure et expression spontanée ;</li>
+<li>une alchimie émotionnelle forte ;</li>
+<li>un potentiel évolutif élevé basé sur la compréhension et l’ouverture.</li>
+</ul>
+<p>Leur essence commune est marquée par {forces_phrase}, {tension_phrase} et {leviers_phrase}.</p>
+
+<h2>Intimité et Vie Privée</h2>
+<p>Dans l’intimité, {nom_a} apporte profondeur et stabilité.<br>{nom_b} apporte mouvement, légèreté et créativité.</p>
+<p>Ils trouvent un équilibre naturel lorsque :</p>
+<ul>
+<li>{nom_a} s’ouvre à plus de spontanéité ;</li>
+<li>{nom_b} ralentit pour accueillir l’émotion et la profondeur.</li>
+</ul>
+<p>Résultat : une intimité vivante, chaleureuse, authentique.</p>
+
+<h2>Communication & Interaction</h2>
+<p>Forces :</p>
+<ul>
+<li>{nom_a} : écoute, intuition, calme.</li>
+<li>{nom_b} : expression, créativité, dynamisme.</li>
+</ul>
+<p>Défis :</p>
+<ul>
+<li>éviter que la sensibilité de {nom_a} ne se sente submergée ;</li>
+<li>éviter que l’énergie verbale de {nom_b} ne devienne impulsive.</li>
+</ul>
+<p>Clés d’harmonisation :</p>
+<ul>
+<li>parler avec douceur ;</li>
+<li>exprimer les besoins simplement ;</li>
+<li>ne pas interpréter trop vite les émotions de l’autre.</li>
 </ul>
 
-<h2>🧠 Synthèse</h2>
-<p>{rapport['synthese']}</p>
+<h2>Influence Mutuelle</h2>
+<p>Ce que {nom_a} apporte à {nom_b} :</p>
+<ul>
+<li>apaisement</li>
+<li>profondeur</li>
+<li>stabilité émotionnelle</li>
+</ul>
+<p>Ce que {nom_b} apporte à {nom_a} :</p>
+<ul>
+<li>ouverture</li>
+<li>dynamisme</li>
+<li>créativité</li>
+</ul>
+<p>Ils se complètent naturellement : ensemble, ils créent un équilibre rare.</p>
 
-<h2>✅ Recommandations</h2>
-<ul>{recommandations_html}</ul>
+<h2>Chemin d’Harmonisation</h2>
+<ul>
+<li>valoriser leurs différences plutôt que les craindre ;</li>
+<li>instaurer un rythme alternant calme ({nom_a}) et mouvement ({nom_b}) ;</li>
+<li>cultiver la gratitude mutuelle ;</li>
+<li>maintenir un dialogue clair et apaisé ;</li>
+<li>nourrir des projets communs stimulant l’un et rassurant l’autre.</li>
+</ul>
+
+<p style="font-weight:bold;">Score de compatibilité : {score}/100</p>
 
 <hr>
 <p style="font-size:12px;color:#777;text-align:center;">Rapport généré automatiquement – Numérologie</p>
@@ -278,25 +345,32 @@ def render_rapport_html(rapport):
 </body>
 </html>
 """
+    return html
+
 
 # ------------------------
 # Exécution
 # ------------------------
-
 if __name__ == "__main__":
-    exemples = (
+    exemples = [
+        ("Danielle Combelles", "24/11/1966", "Frédéric Néron", "23/05/1975"),
         ("Alice", "01/01/2000", "Bob", "04/02/1998"),
         ("Julien", "30/11/1980", "Esther", "12/04/1978")
-    )
+    ]
 
-    i = 1
-    for nom_a, date_a, nom_b, date_b in exemples:
+    for i, (nom_a, date_a, nom_b, date_b) in enumerate(exemples, 1):
         rapport = rapport_couple(nom_a, date_a, nom_b, date_b)
         html = render_rapport_html(rapport)
-
-        path = f"/tmp/rapport-{i}.html"
+        path = f"/tmp/rapport_couple_{i}.html"
         with open(path, "w", encoding="utf-8") as f:
             f.write(html)
 
+        print(f"Rapport Numérologique : {rapport['noms']}")
+        print(
+            f"Bonjour,\n\n"
+            f"Voici votre rapport numérologique de couple.\n\n"
+            f"Score : {rapport['score_compatibilite']}/100\n\n"
+            f"{rapport['synthese']}"
+        )
+
         webbrowser.open(f"file://{path}")
-        i += i

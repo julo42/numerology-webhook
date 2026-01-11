@@ -3,7 +3,7 @@ import os
 import smtplib
 from email.message import EmailMessage
 
-from rapport_couple_v5 import rapport_couple, render_rapport_html
+from rapport_couple_v6 import rapport_couple, render_rapport_html
 
 app = Flask(__name__)
 
