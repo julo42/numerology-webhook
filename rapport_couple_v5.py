@@ -10,8 +10,23 @@ SCORE_MIN = 40
 SCORE_MAX = 90
 
 # ------------------------
-# Phrases éditoriales pour les tensions
+# Phrases complètes pour la synthèse
 # ------------------------
+
+FORCES_PHRASES = {
+    "Leadership partagé": "un leadership équilibré et coopératif",
+    "Complémentarité action/écoute": "une complémentarité entre action et écoute",
+    "Harmonie et écoute mutuelle": "une harmonie basée sur l’écoute réciproque",
+    "Joie et créativité": "une relation joyeuse et créative",
+    "Stabilité et fiabilité": "une stabilité et fiabilité constantes",
+    "Liberté et mouvement": "un couple basé sur la liberté et le mouvement",
+    "Amour durable et protection": "un amour protecteur et durable",
+    "Compréhension profonde": "une compréhension profonde entre partenaires",
+    "Puissance et ambition": "une dynamique de puissance et d’ambition",
+    "Compassion et transmission": "une relation empreinte de compassion et de transmission",
+    "Connexion spirituelle élevée": "une connexion spirituelle élevée",
+    "Différences enrichissantes": "une relation enrichissante grâce à la diversité des personnalités"
+}
 
 TENSION_PHRASES = {
     "ego": "la gestion des ego et des rapports de pouvoir",
@@ -26,6 +41,40 @@ TENSION_PHRASES = {
     "nostalgie": "une propension à se projeter dans le passé",
     "hypersensibilite": "une hypersensibilité émotionnelle",
     "ajustements": "la nécessité d’ajustements mutuels conscients"
+}
+
+LEVIERS_PHRASES = {
+    "Clarifier les rôles": "clarifier les rôles et responsabilités",
+    "Valoriser la sensibilité": "valoriser la sensibilité et l’écoute",
+    "Affirmation personnelle": "favoriser l’affirmation personnelle",
+    "Approfondir le lien": "approfondir le lien émotionnel",
+    "Introduire de la souplesse": "introduire de la souplesse dans le quotidien",
+    "Cadre minimal": "mettre en place un cadre minimal pour structurer la liberté",
+    "Autonomie émotionnelle": "préserver l’autonomie émotionnelle",
+    "Ouverture émotionnelle": "encourager l’ouverture émotionnelle",
+    "Leadership partagé": "pratiquer un leadership partagé",
+    "Renouveau": "favoriser le renouveau et l’adaptation",
+    "Ancrage émotionnel": "ancrer la relation dans le concret",
+    "Communication consciente": "maintenir une communication consciente et régulière"
+}
+
+# ------------------------
+# Termes courts pour tableau
+# ------------------------
+
+TENSION_SHORT = {
+    "ego": "Conflit d’ego",
+    "dominance": "Dominance du 1",
+    "dependance": "Dépendance affective",
+    "superficialite": "Superficialité",
+    "rigidite": "Rigidité",
+    "instabilite": "Instabilité",
+    "fusion": "Fusion excessive",
+    "isolement": "Isolement",
+    "rapport": "Rapport de force",
+    "nostalgie": "Nostalgie",
+    "hypersensibilite": "Hypersensibilité",
+    "ajustements": "Ajustements nécessaires"
 }
 
 # ------------------------
@@ -54,6 +103,30 @@ DEFAULT_COMPAT = {
 }
 
 # ------------------------
+# Interprétation
+# ------------------------
+
+INTERPRETATION_SHORT = {
+    "Synergie exceptionnelle et alignement naturel": "Compatibilité exceptionnelle",
+    "Compatibilité harmonieuse avec potentiel durable": "Compatibilité forte",
+    "Compatibilité évolutive nécessitant ajustements conscients": "Compatibilité évolutive",
+    "Relation karmique à forts enjeux d’apprentissage": "Relation à forts enjeux"
+}
+
+def interpretation(score, short=False):
+    if score >= 85:
+        text = "Synergie exceptionnelle et alignement naturel"
+    elif score >= 70:
+        text = "Compatibilité harmonieuse avec potentiel durable"
+    elif score >= 55:
+        text = "Compatibilité évolutive nécessitant ajustements conscients"
+    else:
+        text = "Relation karmique à forts enjeux d’apprentissage"
+    if short:
+        return INTERPRETATION_SHORT.get(text, text)
+    return text
+
+# ------------------------
 # Outils dates & numérologie
 # ------------------------
 
@@ -66,12 +139,10 @@ def parse_date(date_str):
         raise ValueError("Format de date invalide")
     return dt.strftime("%Y-%m-%d")
 
-
 def reduction_numerologique(n):
     while n > 9 and n not in MASTER_NUMBERS:
         n = sum(int(c) for c in str(n))
     return n
-
 
 def chemin_de_vie(date_str):
     date_norm = parse_date(date_str)
@@ -86,7 +157,6 @@ def compatibilite_couple(cv1, cv2):
     key = tuple(sorted((cv1, cv2)))
     return COMPATIBILITE_MATRIX.get(key, DEFAULT_COMPAT)
 
-
 def calcul_ponderations(cv1, cv2):
     bonus = 0
     diff = abs(cv1 - cv2)
@@ -100,23 +170,11 @@ def calcul_ponderations(cv1, cv2):
         bonus += 5
     return bonus
 
-
 def score_final(cv1, cv2):
     base = compatibilite_couple(cv1, cv2)["score"]
     bonus = calcul_ponderations(cv1, cv2)
     score = base + bonus
     return max(SCORE_MIN, min(SCORE_MAX, score))
-
-
-def interpretation(score):
-    if score >= 85:
-        return "Synergie exceptionnelle et alignement naturel"
-    if score >= 70:
-        return "Compatibilité harmonieuse avec potentiel durable"
-    if score >= 55:
-        return "Compatibilité évolutive nécessitant ajustements conscients"
-    return "Relation karmique à forts enjeux d’apprentissage"
-
 
 def recommandations(cv1, cv2):
     recs = [
@@ -140,18 +198,20 @@ def recommandations(cv1, cv2):
 def rapport_couple(nom_a, date_a, nom_b, date_b):
     cv1 = chemin_de_vie(date_a)
     cv2 = chemin_de_vie(date_b)
+
     compat = compatibilite_couple(cv1, cv2)
     score = score_final(cv1, cv2)
 
-    tension_phrase = TENSION_PHRASES.get(
-        compat.get("tension_key", "ajustements"),
-        "la nécessité d’ajustements relationnels"
-    )
+    # Synthèse phrases complètes
+    forces_phrase = FORCES_PHRASES.get(compat["forces"], compat["forces"])
+    tension_phrase = TENSION_PHRASES.get(compat["tension_key"], "la nécessité d’ajustements mutuels conscients")
+    leviers_phrase = LEVIERS_PHRASES.get(compat["leviers"], compat["leviers"])
 
     synthese = (
         f"{nom_a} et {nom_b} présentent une compatibilité globale de {score}/100. "
-        f"Cette relation repose sur {compat['forces'].lower()} et "
-        f"demande une vigilance particulière concernant {tension_phrase}."
+        f"Cette relation repose sur {forces_phrase} et "
+        f"demande une vigilance particulière concernant {tension_phrase}. "
+        f"Pour progresser, il est conseillé de {leviers_phrase}."
     )
 
     return {
@@ -159,7 +219,7 @@ def rapport_couple(nom_a, date_a, nom_b, date_b):
         "chemin_de_vie": {nom_a: cv1, nom_b: cv2},
         "score_compatibilite": score,
         "interpretation": interpretation(score),
-        "axes_relationnels": compat,
+        "axes_relationnels": compat,  # termes courts pour le tableau
         "recommandations": recommandations(cv1, cv2),
         "synthese": synthese
     }
@@ -178,9 +238,10 @@ def render_rapport_html(rapport):
         f"<li>{rec}</li>" for rec in rapport["recommandations"]
     )
 
-    tension_phrase = TENSION_PHRASES.get(
-        rapport['axes_relationnels'].get("tension_key", "ajustements"),
-        "la nécessité d’ajustements relationnels"
+    # Tensions courtes pour le tableau
+    tension_table = TENSION_SHORT.get(
+        rapport['axes_relationnels'].get("tension_key","ajustements"),
+        "Ajustements nécessaires"
     )
 
     return f"""
@@ -196,12 +257,12 @@ def render_rapport_html(rapport):
 
 <h2>❤️ Compatibilité</h2>
 <p style="font-size:22px;color:#2c7;"><strong>{rapport['score_compatibilite']} / 100</strong></p>
-<p>{rapport['interpretation']}</p>
+<p>{interpretation(rapport['score_compatibilite'], short=True)}</p>
 
 <h2>⚖️ Axes relationnels</h2>
 <ul>
 <li><strong>Forces</strong> : {rapport['axes_relationnels']['forces']}</li>
-<li><strong>Tensions</strong> : {tension_phrase}</li>
+<li><strong>Tensions</strong> : {tension_table}</li>
 <li><strong>Leviers</strong> : {rapport['axes_relationnels']['leviers']}</li>
 </ul>
 
