@@ -1,13 +1,6 @@
 from datetime import datetime
 import webbrowser
-
-# ------------------------
-# Constantes
-# ------------------------
-
-MASTER_NUMBERS = {11, 22, 33}
-SCORE_MIN = 40
-SCORE_MAX = 90
+import re
 
 # ------------------------
 # Matrice de compatibilité
@@ -27,18 +20,14 @@ COMPATIBILITE_MATRIX = {
     (11, 11): {"score": 76, "forces": "Connexion spirituelle élevée", "tensions": "Hypersensibilité", "leviers": "Ancrage émotionnel"}
 }
 
-DEFAULT_COMPAT = {
-    "score": 60,
-    "forces": "Différences enrichissantes",
-    "tensions": "Ajustements nécessaires",
-    "leviers": "Communication consciente"
-}
+MASTER_NUMBERS = {11, 22, 33}
 
 # ------------------------
 # Outils dates & numérologie
 # ------------------------
 
 def parse_date(date_str):
+    """Accepte YYYY-MM-DD ou DD/MM/YYYY"""
     if "-" in date_str:
         dt = datetime.strptime(date_str, "%Y-%m-%d")
     elif "/" in date_str:
@@ -59,65 +48,62 @@ def chemin_de_vie(date_str):
     total = sum(int(c) for c in date_norm if c.isdigit())
     return reduction_numerologique(total)
 
+
 # ------------------------
 # Compatibilité
 # ------------------------
 
+def score_couple(cv1, cv2):
+    diff = abs(cv1 - cv2)
+    return max(40, 100 - diff * 10)
+
+
 def compatibilite_couple(cv1, cv2):
     key = tuple(sorted((cv1, cv2)))
-    return COMPATIBILITE_MATRIX.get(key, DEFAULT_COMPAT)
-
-
-def calcul_ponderations(cv1, cv2):
-    bonus = 0
-
-    # Écart vibratoire
-    diff = abs(cv1 - cv2)
-    if diff <= 2:
-        bonus += 10
-    elif diff >= 6:
-        bonus -= 10
-
-    # Présence de maître-nombre
-    if cv1 in MASTER_NUMBERS:
-        bonus += 5
-    if cv2 in MASTER_NUMBERS:
-        bonus += 5
-
-    return bonus
+    return COMPATIBILITE_MATRIX.get(
+        key,
+        {
+            "score": 60,
+            "forces": "Différences enrichissantes",
+            "tensions": "Ajustements nécessaires",
+            "leviers": "Communication consciente"
+        }
+    )
 
 
 def score_final(cv1, cv2):
-    base = compatibilite_couple(cv1, cv2)["score"]
-    bonus = calcul_ponderations(cv1, cv2)
-    score = base + bonus
-    return max(SCORE_MIN, min(SCORE_MAX, score))
+    matrice = compatibilite_couple(cv1, cv2)["score"]
+    math = score_couple(cv1, cv2)
+    return round(matrice * 0.7 + math * 0.3)
 
 
 def interpretation(score):
     if score >= 85:
-        return "Synergie exceptionnelle et alignement naturel"
-    if score >= 70:
-        return "Compatibilité harmonieuse avec potentiel durable"
+        return "Compatibilité exceptionnelle"
+    if score >= 75:
+        return "Très forte compatibilité"
+    if score >= 65:
+        return "Bonne compatibilité"
     if score >= 55:
-        return "Compatibilité évolutive nécessitant ajustements conscients"
-    return "Relation karmique à forts enjeux d’apprentissage"
+        return "Compatibilité moyenne"
+    return "Relation évolutive et exigeante"
 
 
 def recommandations(cv1, cv2):
     recs = [
-        "Instaurer une communication consciente et régulière.",
-        "Respecter les besoins et rythmes individuels."
+        "Planifier des moments de qualité ensemble.",
+        "Communiquer ouvertement sur les besoins et limites."
     ]
     if 4 in (cv1, cv2):
-        recs.append("Introduire plus de souplesse dans l’organisation.")
+        recs.append("Introduire de la souplesse dans le quotidien.")
     if 5 in (cv1, cv2):
-        recs.append("Préserver l’espace personnel et la liberté.")
+        recs.append("Respecter l’espace personnel et la liberté.")
     if 7 in (cv1, cv2):
-        recs.append("Partager des temps de réflexion ou de profondeur.")
+        recs.append("Partager des réflexions profondes ou spirituelles.")
     if cv1 in MASTER_NUMBERS or cv2 in MASTER_NUMBERS:
-        recs.append("Ancrer la relation dans des projets concrets.")
+        recs.append("Ancrer la relation dans le concret.")
     return recs[:5]
+
 
 # ------------------------
 # Rapport
@@ -131,9 +117,10 @@ def rapport_couple(nom_a, date_a, nom_b, date_b):
     score = score_final(cv1, cv2)
 
     synthese = (
-        f"{nom_a} et {nom_b} présentent une compatibilité globale de {score}/100. "
-        f"Cette relation repose sur {compat['forces'].lower()} et "
-        f"demande une vigilance particulière concernant {compat['tensions'].lower()}."
+        f"{nom_a} et {nom_b} présentent une compatibilité globale de {score}/100 "
+        f"({interpretation(score).lower()}). "
+        f"La relation s’appuie sur {compat['forces'].lower()} "
+        f"et demande une attention particulière sur {compat['tensions'].lower()}."
     )
 
     return {
@@ -145,6 +132,7 @@ def rapport_couple(nom_a, date_a, nom_b, date_b):
         "recommandations": recommandations(cv1, cv2),
         "synthese": synthese
     }
+
 
 # ------------------------
 # HTML
@@ -194,6 +182,7 @@ def render_rapport_html(rapport):
 </body>
 </html>
 """
+
 
 # ------------------------
 # Exécution
