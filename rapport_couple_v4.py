@@ -133,7 +133,8 @@ def rapport_couple(nom_a, date_a, nom_b, date_b):
     synthese = (
         f"{nom_a} et {nom_b} présentent une compatibilité globale de {score}/100. "
         f"Cette relation repose sur {compat['forces'].lower()} et "
-        f"demande une vigilance particulière concernant {compat['tensions'].lower()}."
+        f"demande une vigilance particulière face aux dynamiques de "
+        f"{compat['tensions'].lower()}."
     )
 
     return {
