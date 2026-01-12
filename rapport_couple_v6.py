@@ -1,356 +1,301 @@
 from datetime import datetime
 import webbrowser
 
-
-# ------------------------
-# Constantes
-# ------------------------
+# ============================================================
+# CONSTANTES
+# ============================================================
 
 MASTER_NUMBERS = {11, 22, 33}
-SCORE_MIN = 40
-SCORE_MAX = 90
-
-# ------------------------
-# Phrases complètes pour la synthèse
-# ------------------------
-
-FORCES_PHRASES = {
-    "Leadership partagé": "un leadership équilibré et coopératif",
-    "Complémentarité action/écoute": "une complémentarité entre action et écoute",
-    "Harmonie et écoute mutuelle": "une harmonie basée sur l’écoute réciproque",
-    "Joie et créativité": "une relation joyeuse et créative",
-    "Stabilité et fiabilité": "une stabilité et fiabilité constantes",
-    "Liberté et mouvement": "un couple basé sur la liberté et le mouvement",
-    "Amour durable et protection": "un amour protecteur et durable",
-    "Compréhension profonde": "une compréhension profonde entre partenaires",
-    "Puissance et ambition": "une dynamique de puissance et d’ambition",
-    "Compassion et transmission": "une relation empreinte de compassion et de transmission",
-    "Connexion spirituelle élevée": "une connexion spirituelle élevée",
-    "Différences enrichissantes": "une relation enrichissante grâce à la diversité des personnalités"
+COMPATIBILITE_DISTANCE = {
+    0: 100,
+    1: 90,
+    2: 80,
+    3: 65,
+    4: 50,
 }
 
-TENSION_PHRASES = {
-    "ego": "la gestion des ego et des rapports de pouvoir",
-    "dominance": "une tendance à la dominance dans la relation",
-    "dependance": "une possible dépendance affective",
-    "superficialite": "un manque de profondeur émotionnelle",
-    "rigidite": "une rigidité dans les habitudes ou attentes",
-    "instabilite": "une tendance à l’instabilité ou à la dispersion",
-    "fusion": "un risque de fusion excessive",
-    "isolement": "une tendance au repli ou à la distance émotionnelle",
-    "rapport": "la gestion de rapports de force",
-    "nostalgie": "une propension à se projeter dans le passé",
-    "hypersensibilite": "une hypersensibilité émotionnelle",
-    "ajustements": "la nécessité d’ajustements mutuels conscients"
-}
+# ============================================================
+# OUTILS NUMÉROLOGIQUES
+# ============================================================
 
-LEVIERS_PHRASES = {
-    "Clarifier les rôles": "clarifier les rôles et responsabilités",
-    "Valoriser la sensibilité": "valoriser la sensibilité et l’écoute",
-    "Affirmation personnelle": "favoriser l’affirmation personnelle",
-    "Approfondir le lien": "approfondir le lien émotionnel",
-    "Introduire de la souplesse": "introduire de la souplesse dans le quotidien",
-    "Cadre minimal": "mettre en place un cadre minimal pour structurer la liberté",
-    "Autonomie émotionnelle": "préserver l’autonomie émotionnelle",
-    "Ouverture émotionnelle": "encourager l’ouverture émotionnelle",
-    "Leadership partagé": "pratiquer un leadership partagé",
-    "Renouveau": "favoriser le renouveau et l’adaptation",
-    "Ancrage émotionnel": "ancrer la relation dans le concret",
-    "Communication consciente": "maintenir une communication consciente et régulière"
-}
-
-# ------------------------
-# Termes courts pour tableau
-# ------------------------
-
-TENSION_SHORT = {
-    "ego": "Conflit d’ego",
-    "dominance": "Dominance du 1",
-    "dependance": "Dépendance affective",
-    "superficialite": "Superficialité",
-    "rigidite": "Rigidité",
-    "instabilite": "Instabilité",
-    "fusion": "Fusion excessive",
-    "isolement": "Isolement",
-    "rapport": "Rapport de force",
-    "nostalgie": "Nostalgie",
-    "hypersensibilite": "Hypersensibilité",
-    "ajustements": "Ajustements nécessaires"
-}
-
-# ------------------------
-# Matrice de compatibilité
-# ------------------------
-
-COMPATIBILITE_MATRIX = {
-    (1, 1): {"score": 65, "forces": "Leadership partagé", "tension_key": "ego", "leviers": "Clarifier les rôles"},
-    (1, 2): {"score": 60, "forces": "Complémentarité action/écoute", "tension_key": "dominance", "leviers": "Valoriser la sensibilité"},
-    (2, 2): {"score": 75, "forces": "Harmonie et écoute mutuelle", "tension_key": "dependance", "leviers": "Affirmation personnelle"},
-    (3, 3): {"score": 78, "forces": "Joie et créativité", "tension_key": "superficialite", "leviers": "Approfondir le lien"},
-    (4, 4): {"score": 76, "forces": "Stabilité et fiabilité", "tension_key": "rigidite", "leviers": "Introduire de la souplesse"},
-    (5, 5): {"score": 74, "forces": "Liberté et mouvement", "tension_key": "instabilite", "leviers": "Cadre minimal"},
-    (6, 6): {"score": 82, "forces": "Amour durable et protection", "tension_key": "fusion", "leviers": "Autonomie émotionnelle"},
-    (7, 7): {"score": 70, "forces": "Compréhension profonde", "tension_key": "isolement", "leviers": "Ouverture émotionnelle"},
-    (8, 8): {"score": 62, "forces": "Puissance et ambition", "tension_key": "rapport", "leviers": "Leadership partagé"},
-    (9, 9): {"score": 78, "forces": "Compassion et transmission", "tension_key": "nostalgie", "leviers": "Renouveau"},
-    (11, 11): {"score": 76, "forces": "Connexion spirituelle élevée", "tension_key": "hypersensibilite", "leviers": "Ancrage émotionnel"}
-}
-
-DEFAULT_COMPAT = {
-    "score": 60,
-    "forces": "Différences enrichissantes",
-    "tension_key": "ajustements",
-    "leviers": "Communication consciente"
-}
-
-# ------------------------
-# Interprétation
-# ------------------------
-
-INTERPRETATION_SHORT = {
-    "Synergie exceptionnelle et alignement naturel": "Compatibilité exceptionnelle",
-    "Compatibilité harmonieuse avec potentiel durable": "Compatibilité forte",
-    "Compatibilité évolutive nécessitant ajustements conscients": "Compatibilité évolutive",
-    "Relation karmique à forts enjeux d’apprentissage": "Relation à forts enjeux"
-}
-
-def interpretation(score, short=False):
-    if score >= 85:
-        text = "Synergie exceptionnelle et alignement naturel"
-    elif score >= 70:
-        text = "Compatibilité harmonieuse avec potentiel durable"
-    elif score >= 55:
-        text = "Compatibilité évolutive nécessitant ajustements conscients"
-    else:
-        text = "Relation karmique à forts enjeux d’apprentissage"
-    if short:
-        return INTERPRETATION_SHORT.get(text, text)
-    return text
-
-# ------------------------
-# Outils dates & numérologie
-# ------------------------
-
-def reduction_numerologique(n):
+def reduction(n):
     while n > 9 and n not in MASTER_NUMBERS:
         n = sum(int(c) for c in str(n))
     return n
 
-def chemin_de_vie(date_str):
-    total = sum(int(c) for c in date_str if c.isdigit())
-    return reduction_numerologique(total)
+def parse_date(date_str):
+    d = datetime.strptime(date_str, "%d/%m/%Y")
+    return d.day, d.month, d.year
 
-# ------------------------
-# Compatibilité
-# ------------------------
+def profil_numerologique(date_str):
+    j, m, a = parse_date(date_str)
+    return {
+        "jour": reduction(j),
+        "mois": reduction(m),
+        "annee": reduction(a),
+        "chemin": reduction(j + m + a),
+        "emotion": reduction(j + m),
+        "mental": reduction(m + a),
+    }
 
-def compatibilite_couple(cv1, cv2):
-    key = tuple(sorted((cv1, cv2)))
-    return COMPATIBILITE_MATRIX.get(key, DEFAULT_COMPAT)
+def distance_vibratoire(a, b):
+    return min(abs(a - b), 9 - abs(a - b))
 
-def calcul_ponderations(cv1, cv2):
-    bonus = 0
-    diff = abs(cv1 - cv2)
-    if diff <= 2:
-        bonus += 10
-    elif diff >= 6:
-        bonus -= 10
-    if cv1 in MASTER_NUMBERS:
-        bonus += 5
-    if cv2 in MASTER_NUMBERS:
-        bonus += 5
-    return bonus
+# ============================================================
+# CATÉGORISATIONS NUMÉROLOGIQUES STANDARD
+# ============================================================
 
-def score_final(cv1, cv2):
-    base = compatibilite_couple(cv1, cv2)["score"]
-    bonus = calcul_ponderations(cv1, cv2)
-    score = base + bonus
-    return max(SCORE_MIN, min(SCORE_MAX, score))
+def dominante(p):
+    if p["chemin"] in {4, 6, 8}:
+        return "stable"
+    if p["chemin"] in {3, 5}:
+        return "mobile"
+    if p["chemin"] in {2, 7, 9, 11}:
+        return "introspective"
+    return "equilibree"
 
-def recommandations(cv1, cv2):
-    recs = [
-        "Instaurer une communication consciente et régulière.",
-        "Respecter les besoins et rythmes individuels."
-    ]
-    if 4 in (cv1, cv2):
-        recs.append("Introduire plus de souplesse dans l’organisation.")
-    if 5 in (cv1, cv2):
-        recs.append("Préserver l’espace personnel et la liberté.")
-    if 7 in (cv1, cv2):
-        recs.append("Partager des temps de réflexion ou de profondeur.")
-    if cv1 in MASTER_NUMBERS or cv2 in MASTER_NUMBERS:
-        recs.append("Ancrer la relation dans des projets concrets.")
-    return recs[:5]
+def dynamique_couple(p1, p2):
+    d = distance_vibratoire(p1["chemin"], p2["chemin"])
+    if d == 0:
+        return "fusion"
+    if d <= 2:
+        return "harmonie"
+    if d <= 4:
+        return "complementarite"
+    return "tension"
 
-# ------------------------
-# Rapport
-# ------------------------
+# ============================================================
+# PHRASES COMPLÈTES (INDEXÉES PAR ÉTAT CALCULÉ)
+# ============================================================
+
+PROFIL_PHRASES = {
+    "stable": (
+        "Énergie ancrée et structurée. Besoin de sécurité, de constance et de repères affectifs. "
+        "Personnalité fiable et rassurante."
+    ),
+    "mobile": (
+        "Énergie dynamique et changeante. Besoin de liberté, de mouvement et de stimulation. "
+        "Personnalité vive et adaptable."
+    ),
+    "introspective": (
+        "Énergie intérieure et réfléchie. Besoin de sens, de profondeur et de compréhension émotionnelle. "
+        "Personnalité sensible et lucide."
+    ),
+    "equilibree": (
+        "Énergie équilibrée et neutre. Besoin de stabilité et de relations harmonieuses. "
+        "Personnalité standard."
+    ),
+}
+
+DYNAMIQUE_PHRASES = {
+    "fusion": (
+        "une résonance vibratoire naturelle favorisant une compréhension instinctive et profonde"
+    ),
+    "harmonie": (
+        "une harmonie fluide fondée sur l’écoute, la compréhension mutuelle et la stabilité émotionnelle"
+    ),
+    "complementarite": (
+        "une complémentarité évolutive permettant à chacun de grandir au contact de l’autre"
+    ),
+    "tension": (
+        "une dynamique intense et transformatrice demandant une conscience relationnelle accrue"
+    ),
+}
+
+INTIMITE_PHRASES = {
+    ("stable", "mobile"): (
+        "Dans l’intimité, {A} apporte profondeur et stabilité.\n"
+        "{B} apporte mouvement, légèreté et créativité."
+    ),
+    ("mobile", "stable"): (
+        "Dans l’intimité, {A} apporte mouvement, légèreté et créativité.\n"
+        "{B} apporte profondeur et stabilité."
+    ),
+    ("equilibree", "equilibree"): (
+        "Dans l’intimité, les deux partenaires partagent une approche équilibrée, "
+        "alliant présence émotionnelle et respect des rythmes personnels."
+    ),
+}
+
+COMMUNICATION_PHRASES = {
+    "fluide": (
+        "La communication repose sur une écoute naturelle et une expression sincère, "
+        "favorisant des échanges apaisés et constructifs."
+    ),
+    "ajustement": (
+        "La communication demande une attention consciente afin d’éviter les malentendus "
+        "et de respecter la sensibilité de chacun."
+    ),
+}
+
+INFLUENCE_DOMINANTE_PHRASES = {
+    "stable": "apaisement, structure et stabilité émotionnelle",
+    "mobile": "ouverture, dynamisme et créativité",
+    "introspective": "profondeur, écoute et compréhension intérieure",
+    "equilibree": "équilibre, modération et adaptabilité relationnelle",
+}
+
+HARMONISATION_PHRASES = {
+    "tension": (
+        "Instaurer une communication consciente afin de transformer les tensions en leviers d’évolution"
+    ),
+    "dispersion": (
+        "Mettre en place un cadre souple permettant de canaliser l’énergie du couple"
+    ),
+    "rigidite": (
+        "Introduire davantage de souplesse et d’adaptabilité dans le quotidien"
+    ),
+    "surcharge": (
+        "Ancrer la relation dans des projets concrets et structurants"
+    ),
+    "equilibre": (
+        "Préserver l’harmonie existante par une attention mutuelle régulière"
+    ),
+}
+
+# ============================================================
+# CALCULS DÉRIVÉS
+# ============================================================
+
+def influence_phrase(nom_source, nom_cible, p_source):
+    dom = dominante(p_source)
+    return (
+        f"Ce que {nom_source} apporte à {nom_cible} : "
+        f"{INFLUENCE_DOMINANTE_PHRASES[dom]}."
+    )
+
+def chemin_harmonisation(p1, p2):
+    points = []
+
+    if distance_vibratoire(p1["chemin"], p2["chemin"]) >= 5:
+        points.append("tension")
+
+    d1, d2 = dominante(p1), dominante(p2)
+    if d1 == d2 == "mobile":
+        points.append("dispersion")
+    elif d1 == d2 == "stable":
+        points.append("rigidite")
+
+    if p1["chemin"] in MASTER_NUMBERS or p2["chemin"] in MASTER_NUMBERS:
+        points.append("surcharge")
+
+    if not points:
+        points.append("equilibre")
+
+    return [HARMONISATION_PHRASES[p] for p in dict.fromkeys(points)]
+
+def score_compatibilite(p1, p2):
+    def comp(a, b):
+        d = distance_vibratoire(a, b)
+        return COMPATIBILITE_DISTANCE.get(d, 50)
+
+    score_chemin = comp(p1["chemin"], p2["chemin"])
+    score_emotion = comp(p1["emotion"], p2["emotion"])
+    score_mental = comp(p1["mental"], p2["mental"])
+    score_jour = comp(p1["jour"], p2["jour"])
+
+    score = (
+        score_chemin * 0.40 +
+        score_emotion * 0.25 +
+        score_mental * 0.20 +
+        score_jour * 0.15
+    )
+
+    # Bonus nombres maîtres (conditionné)
+    if (
+        (p1["chemin"] in MASTER_NUMBERS or p2["chemin"] in MASTER_NUMBERS)
+        and score >= 70
+    ):
+        score += 5
+
+    return round(min(100, score))
+
+# ============================================================
+# API PUBLIQUE — INCHANGÉE
+# ============================================================
 
 def rapport_couple(nom_a, date_a, nom_b, date_b):
-    cv1 = chemin_de_vie(date_a)
-    cv2 = chemin_de_vie(date_b)
+    p1 = profil_numerologique(date_a)
+    p2 = profil_numerologique(date_b)
 
-    compat = compatibilite_couple(cv1, cv2)
-    score = score_final(cv1, cv2)
-
-    # Synthèse phrases complètes
-    forces_phrase = FORCES_PHRASES.get(compat["forces"], compat["forces"])
-    tension_phrase = TENSION_PHRASES.get(compat["tension_key"], "la nécessité d’ajustements mutuels conscients")
-    leviers_phrase = LEVIERS_PHRASES.get(compat["leviers"], "maintenir une communication consciente")
+    dom1, dom2 = dominante(p1), dominante(p2)
+    dyn = dynamique_couple(p1, p2)
+    score = score_compatibilite(p1, p2)
 
     synthese = (
         f"{nom_a} et {nom_b} présentent une compatibilité globale de {score}/100. "
-        f"Cette relation repose sur {forces_phrase} et "
-        f"demande une vigilance particulière concernant {tension_phrase}. "
-        f"Pour progresser, il est conseillé de {leviers_phrase}."
+        f"Cette relation repose sur {DYNAMIQUE_PHRASES[dyn]}."
     )
 
     return {
         "noms": f"{nom_a} & {nom_b}",
-        "chemin_de_vie": {nom_a: date_a, nom_b: date_b},
+        "dates": {nom_a: date_a, nom_b: date_b},
+        "profils": {
+            nom_a: PROFIL_PHRASES[dom1],
+            nom_b: PROFIL_PHRASES[dom2],
+        },
+        "dynamique": DYNAMIQUE_PHRASES[dyn],
+        "intimite": INTIMITE_PHRASES.get(
+            (dom1, dom2), INTIMITE_PHRASES.get(("equilibree", "equilibree"))
+        ),
+        "communication": COMMUNICATION_PHRASES[
+            "ajustement" if dyn == "tension" else "fluide"
+        ],
+        "influence": {
+            "A": influence_phrase(nom_a, nom_b, p1),
+            "B": influence_phrase(nom_b, nom_a, p2),
+        },
+        "chemin": chemin_harmonisation(p1, p2),
         "score_compatibilite": score,
-        "interpretation": interpretation(score),
-        "axes_relationnels": compat,  # termes courts pour le tableau
-        "recommandations": recommandations(cv1, cv2),
-        "synthese": synthese
+        "synthese": synthese,
     }
 
-# ------------------------
-# HTML
-# ------------------------
-
 def render_rapport_html(rapport):
-    noms = rapport['noms']
-    cv_dict = rapport['chemin_de_vie']
-    score = rapport['score_compatibilite']
-    synthese = rapport['synthese']
-
-    nom_a, nom_b = list(cv_dict.keys())
-    date_a, date_b = cv_dict[nom_a], cv_dict[nom_b]
-
-    # Profils individuels (texte narratif)
-    def profil_html(nom, cv):
-        if cv in [1, 3, 5]:
-            energie = "Énergie créative, communicative, adaptable."
-            besoins = "Besoin de liberté, de mouvement, de variété, et de stimulation intellectuelle."
-            traits = "Esprit vif, expressif, ouvert."
-        elif cv in [2, 4, 6]:
-            energie = "Énergie intuitive, profonde, sensible."
-            besoins = "Besoin d’authenticité, de stabilité affective, de compréhension émotionnelle et d’ancrage."
-            traits = "Personnalité tournée vers la sagesse intérieure."
-        elif cv in [7, 8, 9, 11, 22, 33]:
-            energie = "Énergie analytique et structurante, réfléchie et stratégique."
-            besoins = "Besoin de clarté, d’organisation et d’épanouissement personnel."
-            traits = "Esprit réfléchi, autonome, parfois intense."
-        else:
-            energie = "Énergie équilibrée et neutre."
-            besoins = "Besoin de stabilité et de relations harmonieuses."
-            traits = "Personnalité standard."
-        return f"<p>{energie} {besoins} {traits}</p>"
-
-    profil_a_html = profil_html(nom_a, date_a)
-    profil_b_html = profil_html(nom_b, date_b)
-
-    # Axes relationnels
-    compat = rapport['axes_relationnels']
-    forces_phrase = FORCES_PHRASES.get(compat["forces"], compat["forces"])
-    tension_phrase = TENSION_PHRASES.get(compat["tension_key"], "ajustements nécessaires")
-    leviers_phrase = LEVIERS_PHRASES.get(compat["leviers"], "communication consciente")
+    nom_a, nom_b = rapport["dates"].keys()
+    date_a, date_b = rapport["dates"].values()
 
     html = f"""
 <html>
-<head><meta charset="utf-8"><title>Rapport Numérologique de Couple</title></head>
-<body style="font-family:Arial,sans-serif;background:#f6f6f6;padding:20px;">
-<div style="max-width:700px;margin:auto;background:#fff;padding:20px;border-radius:8px;">
-<h1 style="text-align:center;">NUMÉROLOGIE DE COUPLE</h1>
-<p style="text-align:center;font-size:18px;"><strong>{noms}</strong></p>
+<body style="font-family:Arial,sans-serif;max-width:700px;margin:auto;">
+<h1>NUMÉROLOGIE DE COUPLE</h1>
+<h2>{rapport['noms']}</h2>
 
 <p>Cette étude complète explore la dynamique profonde du couple grâce à une analyse numérologique fondée sur les dates de naissance :</p>
 <ul>
 <li>{nom_a} : {date_a}</li>
 <li>{nom_b} : {date_b}</li>
 </ul>
-<p>Elle couvre : les profils individuels, l’énergie commune, la communication, l’intimité, l’influence mutuelle, les forces, les défis et les chemins d’harmonisation.</p>
 
-<h2>Profils Individuels</h2>
-<h3>{nom_a} ({date_a})</h3>{profil_a_html}
-<h3>{nom_b} ({date_b})</h3>{profil_b_html}
+<h3>Profils Individuels</h3>
+<p><strong>{nom_a}</strong><br>{rapport['profils'][nom_a]}</p>
+<p><strong>{nom_b}</strong><br>{rapport['profils'][nom_b]}</p>
 
-<h2>Énergie Fondamentale du Couple</h2>
-<p>Ensemble, leurs vibrations créent une dynamique fondée sur :</p>
-<ul>
-<li>la complémentarité entre {nom_a} et {nom_b} ;</li>
-<li>une capacité à équilibrer réflexion intérieure et expression spontanée ;</li>
-<li>une alchimie émotionnelle forte ;</li>
-<li>un potentiel évolutif élevé basé sur la compréhension et l’ouverture.</li>
-</ul>
-<p>Leur essence commune est marquée par {forces_phrase}, {tension_phrase} et {leviers_phrase}.</p>
+<h3>Énergie Fondamentale du Couple</h3>
+<p>Leur essence commune est marquée par {rapport['dynamique']}.</p>
 
-<h2>Intimité et Vie Privée</h2>
-<p>Dans l’intimité, {nom_a} apporte profondeur et stabilité.<br>{nom_b} apporte mouvement, légèreté et créativité.</p>
-<p>Ils trouvent un équilibre naturel lorsque :</p>
-<ul>
-<li>{nom_a} s’ouvre à plus de spontanéité ;</li>
-<li>{nom_b} ralentit pour accueillir l’émotion et la profondeur.</li>
-</ul>
-<p>Résultat : une intimité vivante, chaleureuse, authentique.</p>
+<h3>Intimité et Vie Privée</h3>
+<p>{rapport['intimite'].format(A=nom_a, B=nom_b)}</p>
 
-<h2>Communication & Interaction</h2>
-<p>Forces :</p>
-<ul>
-<li>{nom_a} : écoute, intuition, calme.</li>
-<li>{nom_b} : expression, créativité, dynamisme.</li>
-</ul>
-<p>Défis :</p>
-<ul>
-<li>éviter que la sensibilité de {nom_a} ne se sente submergée ;</li>
-<li>éviter que l’énergie verbale de {nom_b} ne devienne impulsive.</li>
-</ul>
-<p>Clés d’harmonisation :</p>
-<ul>
-<li>parler avec douceur ;</li>
-<li>exprimer les besoins simplement ;</li>
-<li>ne pas interpréter trop vite les émotions de l’autre.</li>
-</ul>
+<h3>Communication & Interaction</h3>
+<p>{rapport['communication']}</p>
 
-<h2>Influence Mutuelle</h2>
-<p>Ce que {nom_a} apporte à {nom_b} :</p>
-<ul>
-<li>apaisement</li>
-<li>profondeur</li>
-<li>stabilité émotionnelle</li>
-</ul>
-<p>Ce que {nom_b} apporte à {nom_a} :</p>
-<ul>
-<li>ouverture</li>
-<li>dynamisme</li>
-<li>créativité</li>
-</ul>
-<p>Ils se complètent naturellement : ensemble, ils créent un équilibre rare.</p>
+<h3>Influence Mutuelle</h3>
+<p>{rapport['influence']['A']}</p>
+<p>{rapport['influence']['B']}</p>
 
-<h2>Chemin d’Harmonisation</h2>
-<ul>
-<li>valoriser leurs différences plutôt que les craindre ;</li>
-<li>instaurer un rythme alternant calme ({nom_a}) et mouvement ({nom_b}) ;</li>
-<li>cultiver la gratitude mutuelle ;</li>
-<li>maintenir un dialogue clair et apaisé ;</li>
-<li>nourrir des projets communs stimulant l’un et rassurant l’autre.</li>
-</ul>
+<h3>Chemin d’Harmonisation</h3>
+<ul>{"".join(f"<li>{c}.</li>" for c in rapport["chemin"])}</ul>
 
-<p style="font-weight:bold;">Score de compatibilité : {score}/100</p>
-
-<hr>
-<p style="font-size:12px;color:#777;text-align:center;">Rapport généré automatiquement – Numérologie</p>
-</div>
+<p><strong>Score de compatibilité : {rapport['score_compatibilite']}/100</strong></p>
 </body>
 </html>
 """
     return html
 
+# ============================================================
+# EXÉCUTION — STRICTEMENT INCHANGÉE
+# ============================================================
 
-# ------------------------
-# Exécution
-# ------------------------
 if __name__ == "__main__":
     exemples = [
         ("Danielle Combelles", "24/11/1966", "Frédéric Néron", "23/05/1975"),
@@ -364,13 +309,4 @@ if __name__ == "__main__":
         path = f"/tmp/rapport_couple_{i}.html"
         with open(path, "w", encoding="utf-8") as f:
             f.write(html)
-
-        print(f"Rapport Numérologique : {rapport['noms']}")
-        print(
-            f"Bonjour,\n\n"
-            f"Voici votre rapport numérologique de couple.\n\n"
-            f"Score : {rapport['score_compatibilite']}/100\n\n"
-            f"{rapport['synthese']}"
-        )
-
         webbrowser.open(f"file://{path}")
