@@ -6,6 +6,7 @@ import webbrowser
 # ============================================================
 
 MASTER_NUMBERS = {11, 22, 33}
+
 COMPATIBILITE_DISTANCE = {
     0: 100,
     1: 90,
@@ -128,13 +129,6 @@ COMMUNICATION_PHRASES = {
     ),
 }
 
-INFLUENCE_DOMINANTE_PHRASES = {
-    "stable": "apaisement, structure et stabilité émotionnelle",
-    "mobile": "ouverture, dynamisme et créativité",
-    "introspective": "profondeur, écoute et compréhension intérieure",
-    "equilibree": "équilibre, modération et adaptabilité relationnelle",
-}
-
 HARMONISATION_PHRASES = {
     "tension": (
         "Instaurer une communication consciente afin de transformer les tensions en leviers d’évolution"
@@ -153,15 +147,86 @@ HARMONISATION_PHRASES = {
     ),
 }
 
+CHEMIN_DOMINANTES = {
+    1: "affirmation",
+    2: "écoute",
+    3: "expression",
+    4: "stabilité",
+    5: "mouvement",
+    6: "harmonie",
+    7: "intériorité",
+    8: "structure",
+    9: "compassion",
+    11: "intuition",
+    22: "construction",
+    33: "transmission",
+}
+
+CHEMIN_FRAGILITES = {
+    1: "écoute",
+    2: "affirmation",
+    3: "constance",
+    4: "souplesse",
+    5: "stabilité",
+    6: "détachement",
+    7: "expression",
+    8: "sensibilité",
+    9: "ancrage",
+    11: "ancrage",
+    22: "souplesse",
+    33: "limites",
+}
+
 # ============================================================
 # CALCULS DÉRIVÉS
 # ============================================================
 
-def influence_phrase(nom_source, nom_cible, p_source):
-    dom = dominante(p_source)
+def influence_mutuelle(nom_A, nom_B, pA, pB):
+    dominante_A = CHEMIN_DOMINANTES[pA["chemin"]]
+    dominante_B = CHEMIN_DOMINANTES[pB["chemin"]]
+
+    mapping_offre = {
+        "affirmation": "élan, prise de décision, affirmation personnelle",
+        "écoute": "apaisement, compréhension, équilibre relationnel",
+        "expression": "légèreté, créativité, joie partagée",
+        "stabilité": "structure, repères, fiabilité",
+        "mouvement": "ouverture, dynamisme, capacité d’adaptation",
+        "harmonie": "équilibre, soutien, harmonie relationnelle",
+        "intériorité": "réflexion, profondeur, clairvoyance",
+        "structure": "organisation, régularité, fiabilité",
+        "compassion": "bienveillance, générosité, soutien",
+        "intuition": "vision, inspiration, élévation spirituelle",
+        "construction": "projet concret, maîtrise, stabilité",
+        "transmission": "partage, guidance, inspiration"
+    }
+
+    mapping_complement = {
+        "affirmation": "écoute, ouverture, adaptabilité",
+        "écoute": "initiative, courage, affirmation",
+        "expression": "écoute, constance, réflexion",
+        "stabilité": "flexibilité, créativité, ouverture",
+        "mouvement": "patience, structuration, constance",
+        "harmonie": "assertivité, décision, initiative",
+        "intériorité": "expression, interaction, partage",
+        "structure": "souplesse, imagination, ouverture",
+        "compassion": "affirmation, protection, énergie",
+        "intuition": "pragmatisme, constance, structure",
+        "construction": "adaptabilité, créativité, souplesse",
+        "transmission": "écoute, patience, équilibre"
+    }
+
+    # A → B = offres de la dominante de A
+    phrase_A = mapping_offre.get(dominante_A, "équilibre, compréhension mutuelle, soutien relationnel")
+
+    # B → A = si identique, on prend le complément
+    if dominante_A == dominante_B:
+        phrase_B = mapping_complement.get(dominante_B, "équilibre, compréhension mutuelle, soutien relationnel")
+    else:
+        phrase_B = mapping_offre.get(dominante_B, "équilibre, compréhension mutuelle, soutien relationnel")
+
     return (
-        f"Ce que {nom_source} apporte à {nom_cible} : "
-        f"{INFLUENCE_DOMINANTE_PHRASES[dom]}."
+        f"Ce que {nom_A} apporte à {nom_B} : {phrase_A}",
+        f"Ce que {nom_B} apporte à {nom_A} : {phrase_B}"
     )
 
 def chemin_harmonisation(p1, p2):
@@ -227,6 +292,8 @@ def rapport_couple(nom_a, date_a, nom_b, date_b):
         f"Cette relation repose sur {DYNAMIQUE_PHRASES[dyn]}."
     )
 
+    influence = influence_mutuelle(nom_a, nom_b, p1, p2)
+
     return {
         "noms": f"{nom_a} & {nom_b}",
         "dates": {nom_a: date_a, nom_b: date_b},
@@ -242,8 +309,8 @@ def rapport_couple(nom_a, date_a, nom_b, date_b):
             "ajustement" if dyn == "tension" else "fluide"
         ],
         "influence": {
-            "A": influence_phrase(nom_a, nom_b, p1),
-            "B": influence_phrase(nom_b, nom_a, p2),
+            "A": influence[0],
+            "B": influence[1],
         },
         "chemin": chemin_harmonisation(p1, p2),
         "score_compatibilite": score,
