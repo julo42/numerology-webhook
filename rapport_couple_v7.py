@@ -160,83 +160,78 @@ DYNAMIQUE_PHRASES = {
 
 def get_profil_phrase_full(p):
     """
-    Génère un profil individuel détaillé selon plusieurs critères :
-    - Chemin de vie (dominante)
-    - Jour (personnalité profonde)
-    - Mois (émotion)
-    - Année (mental)
+    Génère un profil individuel cohérent et fluide :
+    - Chemin de vie : dynamique globale
+    - Jour : expression fondamentale de la personnalité
+    - Mois : climat émotionnel
+    - Année : mode de pensée et de raisonnement
     """
 
     chemin_phrases = {
-        1: "indépendant et assertif",
-        2: "réceptif et diplomate",
-        3: "créatif et expressif",
-        4: "organisé et fiable",
-        5: "adaptable et curieux",
-        6: "protecteur et harmonieux",
-        7: "réfléchi et introspectif",
-        8: "ambitieux et structuré",
-        9: "altruiste et compatissant",
-        11: "visionnaire et intuitif",
-        22: "constructif et stratégique",
-        33: "enseignant et inspirant"
+        1: "une dynamique d’affirmation, d’indépendance et de leadership",
+        2: "une dynamique de coopération, de sensibilité et d’écoute",
+        3: "une dynamique de créativité, de communication et d’expression",
+        4: "une dynamique de construction, de rigueur et de fiabilité",
+        5: "une dynamique de mouvement, de liberté et d’adaptation",
+        6: "une dynamique de responsabilité, de protection et d’harmonie",
+        7: "une dynamique d’introspection, d’analyse et de recherche de sens",
+        8: "une dynamique d’ambition, d’organisation et de maîtrise",
+        9: "une dynamique d’ouverture, d’altruisme et de compréhension globale",
+        11: "une dynamique intuitive, inspirée et visionnaire",
+        22: "une dynamique de réalisation concrète à grande échelle",
+        33: "une dynamique de transmission, de guidance et d’élévation"
     }
 
     jour_phrases = {
-        1: "une forte affirmation de soi et un besoin d’autonomie",
-        2: "une grande sensibilité à l’autre et le sens de la coopération",
-        3: "un besoin naturel d’expression et de créativité",
-        4: "une recherche de stabilité, de structure et de cohérence",
-        5: "une personnalité mobile, attirée par le changement",
-        6: "un sens aigu des responsabilités et de l’harmonie",
-        7: "une nature réservée, analytique et introspective",
-        8: "une personnalité déterminée, orientée vers la réussite",
-        9: "une ouverture humaine et une forte empathie",
-        11: "une intuition marquée et une perception subtile",
-        22: "une capacité à matérialiser de grands projets",
-        33: "une vocation d’accompagnement et de transmission"
+        1: "La personnalité s’exprime avant tout par un besoin d’autonomie et de décision.",
+        2: "La personnalité se manifeste par une grande réceptivité et une attention portée aux autres.",
+        3: "La personnalité trouve son équilibre dans l’expression, la créativité et la communication.",
+        4: "La personnalité recherche avant tout la stabilité, la structure et la cohérence.",
+        5: "La personnalité est marquée par la curiosité, la mobilité et le goût du changement.",
+        6: "La personnalité s’organise autour du sens des responsabilités et du souci de l’harmonie.",
+        7: "La personnalité est intérieure, réfléchie, avec un fort besoin de compréhension.",
+        8: "La personnalité s’affirme par la volonté, la détermination et le sens des objectifs.",
+        9: "La personnalité est tournée vers l’autre, avec une forte dimension humaine.",
+        11: "La personnalité repose sur une intuition fine et une perception subtile.",
+        22: "La personnalité est capable de structurer et de porter des projets d’envergure.",
+        33: "La personnalité est naturellement tournée vers l’accompagnement et la transmission."
     }
 
     mois_phrases = {
-        1: "des émotions directes et spontanées",
-        2: "une sensibilité émotionnelle fine et réceptive",
-        3: "des émotions communicatives et expressives",
-        4: "des émotions stables, maîtrisées et rassurantes",
-        5: "une vie émotionnelle changeante et vive",
-        6: "des émotions protectrices et chaleureuses",
-        7: "une vie intérieure émotionnelle profonde",
-        8: "des émotions contrôlées et orientées vers l’action",
-        9: "des émotions généreuses et tournées vers l’autre",
-        11: "une grande réceptivité émotionnelle et intuitive",
-        22: "une maîtrise émotionnelle au service d’objectifs élevés",
-        33: "une sensibilité émotionnelle tournée vers l’aide et l’amour universel"
+        1: "Sur le plan émotionnel, les réactions sont directes et spontanées.",
+        2: "La vie émotionnelle est sensible, nuancée et profondément réceptive.",
+        3: "Les émotions ont besoin d’être exprimées et partagées.",
+        4: "Les émotions cherchent la sécurité, la constance et l’ancrage.",
+        5: "Le vécu émotionnel est changeant, intense et parfois imprévisible.",
+        6: "Les émotions s’expriment à travers le soin, l’attachement et la protection.",
+        7: "La vie émotionnelle est intériorisée et vécue en profondeur.",
+        8: "Les émotions sont maîtrisées et canalisées vers l’action.",
+        9: "Le registre émotionnel est large, empathique et généreux.",
+        11: "Les émotions sont fortement influencées par l’intuition.",
+        22: "La sphère émotionnelle est maîtrisée au service d’objectifs élevés.",
+        33: "Les émotions sont profondément tournées vers l’amour et le don de soi."
     }
 
     annee_phrases = {
-        1: "un mental rapide, autonome et décisionnel",
-        2: "un mental conciliant et attentif aux nuances",
-        3: "un mental créatif et imaginatif",
-        4: "un mental méthodique, logique et pragmatique",
-        5: "un mental curieux, adaptable et ouvert",
-        6: "un mental responsable, soucieux d’équilibre",
-        7: "un mental analytique, profond et réfléchi",
-        8: "un mental stratégique, orienté résultats",
-        9: "un mental global, humaniste et synthétique",
-        11: "un mental inspiré et intuitif",
-        22: "un mental bâtisseur, capable de vision à long terme",
-        33: "un mental tourné vers la sagesse et la transmission"
+        1: "Le mental fonctionne de manière rapide, autonome et orientée décision.",
+        2: "Le mental est souple, diplomate et attentif aux nuances.",
+        3: "Le mental est imaginatif, créatif et associatif.",
+        4: "Le mental est structuré, logique et pragmatique.",
+        5: "Le mental est curieux, adaptable et ouvert au changement.",
+        6: "Le mental cherche l’équilibre, la cohérence et la responsabilité.",
+        7: "Le mental est analytique, introspectif et profond.",
+        8: "Le mental est stratégique, orienté résultats et efficacité.",
+        9: "Le mental fonctionne de manière globale et synthétique.",
+        11: "Le mental est inspiré, intuitif et visionnaire.",
+        22: "Le mental est bâtisseur, capable de planification à long terme.",
+        33: "Le mental est tourné vers la sagesse et la compréhension élevée."
     }
 
-    chemin_phrase = chemin_phrases.get(p["chemin"], "équilibré et modéré")
-    jour_phrase = jour_phrases.get(p["jour"], "une personnalité nuancée")
-    mois_phrase = mois_phrases.get(p["mois"], "une vie émotionnelle équilibrée")
-    annee_phrase = annee_phrases.get(p["annee"], "un fonctionnement mental harmonieux")
-
     return (
-        f"Chemin de vie : {chemin_phrase}. "
-        f"Personnalité profonde : {jour_phrase}. "
-        f"Vie émotionnelle : {mois_phrase}. "
-        f"Fonctionnement mental : {annee_phrase}."
+        f"Chemin de vie : {chemin_phrases.get(p['chemin'], 'une dynamique équilibrée et nuancée')}. "
+        f"{jour_phrases.get(p['jour'], 'La personnalité présente une expression équilibrée.')}"
+        f" {mois_phrases.get(p['mois'], 'La vie émotionnelle reste globalement stable.')}"
+        f" {annee_phrases.get(p['annee'], 'Le fonctionnement mental est harmonieux.')}"
     )
 
 # ============================================================
