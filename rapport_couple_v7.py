@@ -166,7 +166,7 @@ def get_profil_phrase_full(p):
     - Mois (émotion)
     - Année (mental)
     """
-    chemin_dom = CHEMIN_DOMINANTES.get(p["chemin"], "équilibre")
+
     chemin_phrases = {
         1: "indépendant et assertif",
         2: "réceptif et diplomate",
@@ -181,11 +181,62 @@ def get_profil_phrase_full(p):
         22: "constructif et stratégique",
         33: "enseignant et inspirant"
     }
+
+    jour_phrases = {
+        1: "une forte affirmation de soi et un besoin d’autonomie",
+        2: "une grande sensibilité à l’autre et le sens de la coopération",
+        3: "un besoin naturel d’expression et de créativité",
+        4: "une recherche de stabilité, de structure et de cohérence",
+        5: "une personnalité mobile, attirée par le changement",
+        6: "un sens aigu des responsabilités et de l’harmonie",
+        7: "une nature réservée, analytique et introspective",
+        8: "une personnalité déterminée, orientée vers la réussite",
+        9: "une ouverture humaine et une forte empathie",
+        11: "une intuition marquée et une perception subtile",
+        22: "une capacité à matérialiser de grands projets",
+        33: "une vocation d’accompagnement et de transmission"
+    }
+
+    mois_phrases = {
+        1: "des émotions directes et spontanées",
+        2: "une sensibilité émotionnelle fine et réceptive",
+        3: "des émotions communicatives et expressives",
+        4: "des émotions stables, maîtrisées et rassurantes",
+        5: "une vie émotionnelle changeante et vive",
+        6: "des émotions protectrices et chaleureuses",
+        7: "une vie intérieure émotionnelle profonde",
+        8: "des émotions contrôlées et orientées vers l’action",
+        9: "des émotions généreuses et tournées vers l’autre",
+        11: "une grande réceptivité émotionnelle et intuitive",
+        22: "une maîtrise émotionnelle au service d’objectifs élevés",
+        33: "une sensibilité émotionnelle tournée vers l’aide et l’amour universel"
+    }
+
+    annee_phrases = {
+        1: "un mental rapide, autonome et décisionnel",
+        2: "un mental conciliant et attentif aux nuances",
+        3: "un mental créatif et imaginatif",
+        4: "un mental méthodique, logique et pragmatique",
+        5: "un mental curieux, adaptable et ouvert",
+        6: "un mental responsable, soucieux d’équilibre",
+        7: "un mental analytique, profond et réfléchi",
+        8: "un mental stratégique, orienté résultats",
+        9: "un mental global, humaniste et synthétique",
+        11: "un mental inspiré et intuitif",
+        22: "un mental bâtisseur, capable de vision à long terme",
+        33: "un mental tourné vers la sagesse et la transmission"
+    }
+
     chemin_phrase = chemin_phrases.get(p["chemin"], "équilibré et modéré")
+    jour_phrase = jour_phrases.get(p["jour"], "une personnalité nuancée")
+    mois_phrase = mois_phrases.get(p["mois"], "une vie émotionnelle équilibrée")
+    annee_phrase = annee_phrases.get(p["annee"], "un fonctionnement mental harmonieux")
+
     return (
         f"Chemin de vie : {chemin_phrase}. "
-        f"Nuances personnelles : personnalité centrée sur le jour {p['jour']}, "
-        f"émotions influencées par le mois {p['mois']}, mental et réflexion guidés par l'année {p['annee']}."
+        f"Personnalité profonde : {jour_phrase}. "
+        f"Vie émotionnelle : {mois_phrase}. "
+        f"Fonctionnement mental : {annee_phrase}."
     )
 
 # ============================================================
