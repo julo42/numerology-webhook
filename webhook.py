@@ -21,8 +21,12 @@ def generate_and_send_email(prenom1, date1, prenom2, date2, recipient):
     """
     print(f"[GPT] Début génération pour {prenom1} + {prenom2}…")
 
+    buf = ''
+    with open('rules', 'r', encoding='utf-8') as fd:
+        buf += fd.read()
+    buf += '\n\n'
     with open('prompt', 'r', encoding='utf-8') as fd:
-        buf = fd.read()
+        buf += fd.read()
 
     prompt = buf.format(
         prenom1=prenom1,

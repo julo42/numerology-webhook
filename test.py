@@ -7,8 +7,12 @@ if __name__ == '__main__':
     prenom2 = 'Esther'
     date2 = '12/04/1978'
 
+    buf = ''
+    with open('rules', 'r', encoding='utf-8') as fd:
+        buf += fd.read()
+    buf += '\n\n'
     with open('prompt', 'r', encoding='utf-8') as fd:
-        buf = fd.read()
+        buf += fd.read()
 
     prompt = buf.format(
         prenom1=prenom1,
