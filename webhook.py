@@ -13,11 +13,11 @@ GMAIL_USER = os.environ.get("SENDER_EMAIL")
 GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD")
 
 # OpenAI
-client = OpenAI(timeout=30)  # Timeout global pour éviter que Render tue le worker
+client = OpenAI(timeout=60)  # Timeout global
 
-def generate_guidance(prenom1, date1, prenom2, date2):
+def generate_guidance_stream(prenom1, date1, prenom2, date2):
     """
-    Génère la guidance de couple via OpenAI GPT-5-mini.
+    Génère la guidance complète en streaming depuis GPT-5-mini
     """
     prompt = SYSTEM_PROMPT_PREMIUM.format(
         prenom1=prenom1,
@@ -25,23 +25,30 @@ def generate_guidance(prenom1, date1, prenom2, date2):
         prenom2=prenom2,
         date2=date2
     )
+
+    guidance_text = ""
     try:
-        response = client.responses.create(
+        with client.responses.stream(
             model="gpt-5-mini",
             input=prompt,
-            reasoning={"effort": "low"},  # rapide et suffisant
-            max_output_tokens=1500,        # taille raisonnable
-        )
-        # Utilisation directe de output_text
-        return response.output_text or "Erreur : réponse vide."
+            reasoning={"effort": "medium"},  # qualité correcte + rapide
+        ) as stream:
+            for event in stream:
+                # Chaque delta de texte généré
+                if event.type == "output_text.delta":
+                    guidance_text += event.delta
+        return guidance_text
+
     except Exception as e:
+        # Renvoie une erreur lisible
         return f"Erreur génération guidance: {str(e)}"
 
 @app.route("/send_report", methods=["POST"])
 def send_report():
-    payload = request.json or {}
+    payload = request.json
     contact = payload.get("data", {}).get("contact", {})
 
+    # Mapping des champs système.io → notre format
     fields_map = {
         "nom_a": "first_name",
         "date_a": "date_de_naissance",
@@ -58,18 +65,16 @@ def send_report():
 
     # Vérification des champs requis
     for field in ["nom_a", "date_a", "nom_b", "date_b", "email"]:
-        if not data.get(field):
+        if field not in data or not data[field]:
             return jsonify({"error": f"Missing field: {field}"}), 400
 
-    # Génération IA
-    guidance_text = generate_guidance(
-        data["nom_a"],
-        data["date_a"],
-        data["nom_b"],
-        data["date_b"]
+    # Génération guidance via streaming
+    guidance_text = generate_guidance_stream(
+        data["nom_a"], data["date_a"],
+        data["nom_b"], data["date_b"]
     )
 
-    # Préparation email
+    # Préparation de l'email
     msg = EmailMessage()
     msg["From"] = GMAIL_USER
     msg["To"] = data["email"]
@@ -88,13 +93,16 @@ def send_report():
         </html>
     """, subtype="html")
 
+    # Envoi sécurisé via SMTP SSL
     try:
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=30) as server:
             server.login(GMAIL_USER, GMAIL_APP_PASSWORD)
             server.send_message(msg)
+
         return jsonify({"status": "success"}), 200
+
     except Exception as e:
-        return jsonify({"error": f"Envoi email échoué: {str(e)}"}), 500
+        return jsonify({"error": f"Erreur SMTP: {str(e)}"}), 500
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
