@@ -15,14 +15,9 @@ GMAIL_USER = os.environ.get("SENDER_EMAIL")
 GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD")
 
 # OpenAI client
-client = OpenAI(timeout=180)  # Timeout global 3 minutes
+client = OpenAI(timeout=180)  # Timeout global
 
 def generate_guidance_stream(prenom1, date1, prenom2, date2):
-    """
-    Génération GPT-5-mini complète via streaming.
-    Retourne le texte complet à la fin.
-    Logs dans Render en temps réel.
-    """
     prompt = SYSTEM_PROMPT_PREMIUM.format(
         prenom1=prenom1,
         date1=date1,
@@ -34,16 +29,17 @@ def generate_guidance_stream(prenom1, date1, prenom2, date2):
     print(f"[GPT] Début génération pour {prenom1} + {prenom2}…", flush=True)
 
     try:
+        # Streaming GPT complet
         with client.responses.stream(
             model="gpt-5-mini",
             input=prompt,
-            reasoning={"effort": "high"}  # qualité maximale
+            reasoning={"effort": "high"}
         ) as stream:
             for event in stream:
                 if hasattr(event, "type") and event.type in ("output_text.delta", "output_text"):
                     delta = getattr(event, "delta", None) or getattr(event, "text", "")
                     guidance_text += delta
-                    print(delta, end="", flush=True)  # log progress
+                    print(delta, end="", flush=True)
         print(f"\n[GPT] Génération terminée ({len(guidance_text)} caractères).", flush=True)
         return guidance_text.strip()
     except Exception as e:
@@ -52,9 +48,6 @@ def generate_guidance_stream(prenom1, date1, prenom2, date2):
         return err_msg
 
 def send_email(recipient, subject, text):
-    """
-    Envoi sécurisé du mail
-    """
     msg = EmailMessage()
     msg["From"] = GMAIL_USER
     msg["To"] = recipient
@@ -75,9 +68,7 @@ def send_email(recipient, subject, text):
         print(f"[MAIL] Erreur SMTP: {e}", flush=True)
 
 def process_report_background(data):
-    """
-    Tâche en arrière-plan : génération GPT + envoi email
-    """
+    """Tâche en arrière-plan : génération GPT + envoi email"""
     try:
         guidance_text = generate_guidance_stream(
             data["nom_a"], data["date_a"],
@@ -110,10 +101,10 @@ def send_report():
         if not data.get(field):
             return jsonify({"error": f"Missing field: {field}"}), 400
 
-    # Lancer le traitement en arrière-plan
+    # Lancer le traitement **en arrière-plan**
     Thread(target=process_report_background, args=(data,), daemon=True).start()
 
-    # Réponse immédiate
+    # Réponse HTTP immédiate
     print(f"[API] Requête reçue pour {data['email']}, traitement en arrière-plan.", flush=True)
     return jsonify({
         "status": "processing",
