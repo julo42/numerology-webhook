@@ -33,7 +33,7 @@ def generate_guidance_stream(prenom1, date1, prenom2, date2):
         with client.responses.stream(
             model="gpt-5-mini",
             input=prompt,
-            reasoning={"effort": "high"}
+            reasoning={"effort": "low"}
         ) as stream:
             for event in stream:
                 if hasattr(event, "type") and event.type in ("output_text.delta", "output_text"):
@@ -102,7 +102,7 @@ def send_report():
             return jsonify({"error": f"Missing field: {field}"}), 400
 
     # Lancer le traitement **en arrière-plan**
-    Thread(target=process_report_background, args=(data,), daemon=True).start()
+    Thread(target=process_report_background, args=(data,), daemon=False).start()
 
     # Réponse HTTP immédiate
     print(f"[API] Requête reçue pour {data['email']}, traitement en arrière-plan.", flush=True)
