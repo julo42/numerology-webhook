@@ -37,11 +37,9 @@ def generate_and_send_email(prenom1, date1, prenom2, date2, recipient):
             reasoning={"effort": "medium"},  # qualité correcte
         ) as stream:
             for event in stream:
-                if event.type == "output_text.delta":
+                if event.type == "response.output_text.delta":
                     guidance_text += event.delta
-                    # Log progress tous les 100 caractères
-                    if len(guidance_text) % 100 < len(event.delta):
-                        print(f"[GPT] {len(guidance_text)} caractères générés…")
+                    print(f"[GPT] {event.delta}")
         print(f"[GPT] Génération terminée ({len(guidance_text)} caractères).")
 
     except Exception as e:
