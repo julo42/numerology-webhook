@@ -30,12 +30,11 @@ def generate_guidance(prenom1, date1, prenom2, date2):
         max_output_tokens=3500
     )
 
-    # Extraction robuste
     parts = []
-    for item in response.output:
-        for content in item.content:
-            if content["type"] == "output_text":
-                parts.append(content["text"])
+    for item in response.output or []:
+        for content in getattr(item, "content", []) or []:
+            if content.get("type") == "output_text":
+                parts.append(content.get("text", ""))
 
     return "\n".join(parts)
 
