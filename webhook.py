@@ -26,7 +26,7 @@ def generate_guidance(prenom1, date1, prenom2, date2):
     response = client.responses.create(
         model="gpt-5-mini",
         input=prompt,
-        reasoning={"effort": "none"},   # important : pas de tokens perdus
+        reasoning={"effort": "low"},
         max_output_tokens=3500
     )
 
