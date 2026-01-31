@@ -4,7 +4,6 @@ import smtplib
 from email.message import EmailMessage
 import threading
 from openai import OpenAI
-from prompt import SYSTEM_PROMPT_PREMIUM
 
 app = Flask(__name__)
 
@@ -22,7 +21,10 @@ def generate_and_send_email(prenom1, date1, prenom2, date2, recipient):
     """
     print(f"[GPT] Début génération pour {prenom1} + {prenom2}…")
 
-    prompt = SYSTEM_PROMPT_PREMIUM.format(
+    with open('prompt', 'r', encoding='utf-8') as fd:
+        buf = fd.read()
+
+    prompt = buf.format(
         prenom1=prenom1,
         date1=date1,
         prenom2=prenom2,
