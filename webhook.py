@@ -28,8 +28,7 @@ def generate_and_send_email(data):
     guidance_text = client.responses.create(
         model="gpt-5-mini",
         input=prompt,
-        reasoning={"effort":"medium"},
-        max_output_tokens=4000
+        reasoning={"effort":"medium"}
     ).output_text
 
     # Préparation email
