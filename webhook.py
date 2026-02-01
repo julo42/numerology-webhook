@@ -184,60 +184,77 @@ def admin_update_templates():
 def admin_page():
     return """
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-<meta charset="utf-8">
-<title>Admin templates</title>
+<meta charset="UTF-8">
+<title>Admin – Templates</title>
 <style>
-body { font-family: Arial; max-width: 900px; margin: auto; }
+body { font-family: Arial; max-width: 900px; margin: auto; padding: 20px; }
 input, textarea { width: 100%; margin-bottom: 12px; }
 textarea { height: 320px; font-family: monospace; }
+.hidden { display: none; }
+button { padding: 8px 16px; }
 </style>
 </head>
 <body>
 
-<h2>Admin – Templates GPT</h2>
+<h2>Administration</h2>
 
-<input id="pwd" type="password" placeholder="Mot de passe admin">
+<div id="login">
+    <p>Mot de passe :</p>
+    <input type="password" id="pwd">
+    <button onclick="login()">Connexion</button>
+</div>
 
-<input id="subject" placeholder="Sujet email">
+<div id="editor" class="hidden">
+    <p><strong>Sujet</strong></p>
+    <input id="subject">
 
-<textarea id="prompt" placeholder="Prompt GPT"></textarea>
+    <p><strong>Prompt</strong></p>
+    <textarea id="prompt"></textarea>
 
-<button onclick="save()">💾 Sauvegarder</button>
+    <button onclick="save()">💾 Sauvegarder</button>
+</div>
 
 <script>
-async function load() {
-    const pwd = pwdEl.value;
-    const r = await fetch("/admin/templates", {
+let adminPassword = "";
+
+async function login() {
+    const pwd = document.getElementById("pwd").value;
+    const res = await fetch("/admin/templates", {
         headers: { "X-Admin-Password": pwd }
     });
-    if (!r.ok) return alert("Mot de passe incorrect");
-    const d = await r.json();
-    subject.value = d.subject;
-    prompt.value = d.prompt;
+
+    if (!res.ok) {
+        alert("Mot de passe incorrect");
+        return;
+    }
+
+    adminPassword = pwd;
+
+    const data = await res.json();
+    document.getElementById("subject").value = data.subject;
+    document.getElementById("prompt").value = data.prompt;
+
+    document.getElementById("login").classList.add("hidden");
+    document.getElementById("editor").classList.remove("hidden");
 }
 
 async function save() {
-    const r = await fetch("/admin/templates", {
+    const res = await fetch("/admin/templates", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "X-Admin-Password": pwd.value
+            "X-Admin-Password": adminPassword
         },
         body: JSON.stringify({
-            subject: subject.value,
-            prompt: prompt.value
+            subject: document.getElementById("subject").value,
+            prompt: document.getElementById("prompt").value
         })
     });
-    alert(r.ok ? "Sauvegardé" : "Erreur");
+
+    alert(res.ok ? "✔ Sauvegardé" : "❌ Erreur");
 }
-
-const pwdEl = document.getElementById("pwd");
-const subject = document.getElementById("subject");
-const prompt = document.getElementById("prompt");
-
-pwdEl.addEventListener("change", load);
 </script>
 
 </body>
