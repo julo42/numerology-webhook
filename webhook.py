@@ -101,9 +101,6 @@ def generate_and_send_email_from_file(job_file_path):
 
         print(f"[MAIL] Envoyé à {recipient}")
 
-    except Exception as e:
-        print(f"[ERROR] {e}")
-
     finally:
         if os.path.exists(job_file_path):
             os.remove(job_file_path)
