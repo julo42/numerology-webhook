@@ -41,6 +41,11 @@ for f in os.listdir(PROCESSING_DIR):
 
 print(f"[STARTUP] Worker prêt. Pending jobs : {len(os.listdir(PENDING_DIR))}")
 
+# ---------- lancement des workers ----------
+for _ in range(NUM_THREADS):
+    t = threading.Thread(target=worker_loop)
+    t.start()
+
 
 # -----------------------------
 # Fonction de traitement d'un job
@@ -189,11 +194,6 @@ def send_report():
 # Main : démarrage threads + Flask
 # -----------------------------
 if __name__ == "__main__":
-    # Lancer les workers
-    for _ in range(NUM_THREADS):
-        t = threading.Thread(target=worker_loop)
-        t.start()  # pas daemon, on veut qu'ils vivent tant que le serveur est up
-
     port = int(os.environ.get("PORT", 5000))
     print(f"[STARTUP] Serveur Flask démarré sur {port}")
     app.run(host="0.0.0.0", port=port, debug=False, use_reloader=False, threaded=True)
