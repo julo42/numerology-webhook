@@ -72,7 +72,6 @@ def generate_and_send_email_from_file(job_file_path):
             date2=date2
         )
 
-        last_logged = 0
         guidance_text = ""
         try:
             with client.responses.stream(
@@ -83,9 +82,6 @@ def generate_and_send_email_from_file(job_file_path):
                 for event in stream:
                     if event.type == "response.output_text.delta":
                         guidance_text += event.delta
-                        if len(guidance_text) // 100 > last_logged:
-                            last_logged = len(guidance_text) // 100
-                            print(f"[GPT] {len(guidance_text)} caractères générés…")
             print(f"[GPT] Génération terminée ({len(guidance_text)} caractères).")
 
         except Exception as e:
