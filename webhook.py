@@ -25,6 +25,26 @@ PENDING_DIR = os.path.join(BASE_DIR, "pending")
 PROCESSING_DIR = os.path.join(BASE_DIR, "processing")
 
 
+os.makedirs(PENDING_DIR, exist_ok=True)
+os.makedirs(PROCESSING_DIR, exist_ok=True)
+
+# Reprise automatique au démarrage : déplacer tous les jobs processing-* vers pending
+for f in os.listdir(PROCESSING_DIR):
+    src = os.path.join(PROCESSING_DIR, f)
+    dst = os.path.join(PENDING_DIR, f)
+    try:
+        os.rename(src, dst)  # move atomique
+    except FileExistsError:
+        os.remove(src)
+
+print(f"[STARTUP] Worker prêt. Pending jobs : {len(os.listdir(PENDING_DIR))}")
+
+NUM_THREADS = 2  # nombre de threads worker
+for _ in range(NUM_THREADS):
+    t = threading.Thread(target=worker_loop, daemon=True)
+    t.start()
+
+
 # -----------------------------
 # Fonction de traitement d'un job
 # -----------------------------
@@ -169,24 +189,5 @@ def send_report():
 # Main : démarrage threads + Flask
 # -----------------------------
 if __name__ == "__main__":
-    os.makedirs(PENDING_DIR, exist_ok=True)
-    os.makedirs(PROCESSING_DIR, exist_ok=True)
-
-    # Reprise automatique au démarrage : déplacer tous les jobs processing-* vers pending
-    for f in os.listdir(PROCESSING_DIR):
-        src = os.path.join(PROCESSING_DIR, f)
-        dst = os.path.join(PENDING_DIR, f)
-        try:
-            os.rename(src, dst)  # move atomique
-        except FileExistsError:
-            os.remove(src)
-
-    print(f"[STARTUP] Worker prêt. Pending jobs : {len(os.listdir(PENDING_DIR))}")
-
-    NUM_THREADS = 2  # nombre de threads worker
-    for _ in range(NUM_THREADS):
-        t = threading.Thread(target=worker_loop, daemon=True)
-        t.start()
-
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
