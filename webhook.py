@@ -60,13 +60,13 @@ def generate_and_send_email_from_file(job_file_path):
         print(f'File processing: {job_file_path}: {data}')
 
         recipient = data["email"]
-        del data["email"]
+        fields = data["fields"]
 
         with open(SUBJECT_FILE, "r", encoding="utf-8") as f:
-            subject = f.read().format(**data)
+            subject = f.read().format(**fields)
 
         with open(PROMPT_FILE, "r", encoding="utf-8") as f:
-            prompt = f.read().format(**data)
+            prompt = f.read().format(**fields)
 
         guidance_text = ""
 
