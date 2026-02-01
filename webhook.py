@@ -126,6 +126,7 @@ def generate_and_send_email_from_file(job_file_path):
 def worker_loop():
     while True:
         pending_files = os.listdir(PENDING_DIR)
+        print(f'PENDING FILES: {pending_files}')
         if not pending_files:
             time.sleep(1)
             continue
@@ -179,6 +180,8 @@ def send_report():
             "recipient": data["email"]
         }, f)
 
+    print(f'DEBUG: Job file créé: {job_file}')
+
     print(f"[API] Requête reçue pour {data['email']}, job créé {job_id}")
     return jsonify({"status": "accepted", "message": "Le rapport sera envoyé par email."}), 202
 
@@ -186,11 +189,9 @@ def send_report():
 # Main : démarrage threads + Flask
 # -----------------------------
 if __name__ == "__main__":
-    # Désactiver le reloader pour éviter double process
-    port = int(os.environ.get("PORT", 5000))
-
     for _ in range(NUM_THREADS):
         t = threading.Thread(target=worker_loop, daemon=True)
         t.start()
 
-    app.run(host="0.0.0.0", port=port, debug=False, use_reloader=False)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
