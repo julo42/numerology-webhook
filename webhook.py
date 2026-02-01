@@ -186,9 +186,11 @@ def send_report():
 # Main : démarrage threads + Flask
 # -----------------------------
 if __name__ == "__main__":
+    # Désactiver le reloader pour éviter double process
+    port = int(os.environ.get("PORT", 5000))
+
     for _ in range(NUM_THREADS):
         t = threading.Thread(target=worker_loop, daemon=True)
         t.start()
 
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=port, debug=False, use_reloader=False)
