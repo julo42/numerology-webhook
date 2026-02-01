@@ -18,13 +18,13 @@ Toutes les analyses doivent être strictement déduites des résultats de calcul
 DONNÉES CALCULEES
 ────────────────────────────
 
-Personne A ({prenom1}, né(e) le {date1})
+Personne A ({nom1}, né(e) le {date1})
 - Chemin de vie A
 - Nombre d’Expression A
 - Nombre de l’Âme A
 - Nombre de Personnalité A
 
-Personne B ({prenom2}, né(e) le {date2})
+Personne B ({nom2}, né(e) le {date2})
 - Chemin de vie B
 - Nombre d’Expression B
 - Nombre de l’Âme B
