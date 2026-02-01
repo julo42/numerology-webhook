@@ -42,7 +42,7 @@ for f in os.listdir(PROCESSING_DIR):
     except Exception:
         pass
 
-print(f"[STARTUP] Pending jobs: {len(os.listdir(PENDING_DIR))}")
+print(f"Pending jobs: {len(os.listdir(PENDING_DIR))}")
 
 # -----------------------------
 # Auth helper
@@ -57,10 +57,11 @@ def generate_and_send_email_from_file(job_file_path):
     try:
         with open(job_file_path, "r", encoding="utf-8") as f:
             data = json.load(f)
-        print(f'File processing: {job_file_path}: {data}')
 
-        recipient = data["email"]
+        email = data["email"]
         fields = data["fields"]
+
+        print(f"Generating report for {email}")
 
         with open(SUBJECT_FILE, "r", encoding="utf-8") as f:
             subject = f.read().format(**fields)
@@ -69,9 +70,6 @@ def generate_and_send_email_from_file(job_file_path):
             prompt = f.read().format(**fields)
 
         guidance_text = ""
-
-        print('SUBJECT:', subject)
-        print('PROMPT:', prompt)
 
         with client.responses.stream(
             model="gpt-5-mini",
@@ -84,7 +82,7 @@ def generate_and_send_email_from_file(job_file_path):
 
         msg = EmailMessage()
         msg["From"] = GMAIL_USER
-        msg["To"] = recipient
+        msg["To"] = email
         msg["Subject"] = subject
         msg.set_content(guidance_text[:4000])
 
@@ -99,7 +97,7 @@ def generate_and_send_email_from_file(job_file_path):
             server.login(GMAIL_USER, GMAIL_APP_PASSWORD)
             server.send_message(msg)
 
-        print(f"[MAIL] Envoyé à {recipient}")
+        print(f"Report sent to {email}")
 
     finally:
         if os.path.exists(job_file_path):
@@ -114,7 +112,6 @@ def worker_loop():
         for fname in os.listdir(PENDING_DIR):
             src = os.path.join(PENDING_DIR, fname)
             dst = os.path.join(PROCESSING_DIR, fname)
-            print(f'File found: {src} -> {dst}')
             try:
                 os.rename(src, dst)
             except Exception:
