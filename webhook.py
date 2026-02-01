@@ -57,6 +57,7 @@ def generate_and_send_email_from_file(job_file_path):
     try:
         with open(job_file_path, "r", encoding="utf-8") as f:
             data = json.load(f)
+        print(f'File processing: {job_file_path}: {data}')
 
         recipient = data["email"]
         del data["email"]
@@ -69,7 +70,6 @@ def generate_and_send_email_from_file(job_file_path):
 
         guidance_text = ""
 
-        print('DATA:', data)
         print('SUBJECT:', subject)
         print('PROMPT:', prompt)
 
@@ -117,6 +117,7 @@ def worker_loop():
         for fname in os.listdir(PENDING_DIR):
             src = os.path.join(PENDING_DIR, fname)
             dst = os.path.join(PROCESSING_DIR, fname)
+            print(f'File found: {src} -> {dst}')
             try:
                 os.rename(src, dst)
             except Exception:
@@ -143,6 +144,7 @@ def send_report():
 
     with open(job_file, "w", encoding="utf-8") as f:
         json.dump(data, f)
+    print(f'File generated: {job_file}')
 
     return jsonify({"status": "accepted"}), 202
 
