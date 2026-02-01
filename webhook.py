@@ -41,11 +41,6 @@ for f in os.listdir(PROCESSING_DIR):
 
 print(f"[STARTUP] Worker prêt. Pending jobs : {len(os.listdir(PENDING_DIR))}")
 
-# ---------- lancement des workers ----------
-for _ in range(NUM_THREADS):
-    t = threading.Thread(target=worker_loop)
-    t.start()
-
 
 # -----------------------------
 # Fonction de traitement d'un job
@@ -129,9 +124,10 @@ def generate_and_send_email_from_file(job_file_path):
 # Worker loop
 # -----------------------------
 def worker_loop():
+    print("[WORKER LOOP] start")
+
     while True:
         pending_files = os.listdir(PENDING_DIR)
-        print(f'PENDING FILES: {pending_files}')
         if not pending_files:
             time.sleep(1)
             continue
@@ -146,6 +142,14 @@ def worker_loop():
             except FileExistsError:
                 continue
             generate_and_send_email_from_file(dst_path)
+
+    print("[WORKER LOOP] finish")
+
+# ---------- lancement des workers ----------
+for _ in range(NUM_THREADS):
+    t = threading.Thread(target=worker_loop)
+    t.start()
+
 
 # -----------------------------
 # Flask API
@@ -184,8 +188,6 @@ def send_report():
             "date2": data["date_b"],
             "recipient": data["email"]
         }, f)
-
-    print(f'DEBUG: Job file créé: {job_file}')
 
     print(f"[API] Requête reçue pour {data['email']}, job créé {job_id}")
     return jsonify({"status": "accepted", "message": "Le rapport sera envoyé par email."}), 202
