@@ -69,6 +69,10 @@ def generate_and_send_email_from_file(job_file_path):
 
         guidance_text = ""
 
+        print('DATA:', data)
+        print('SUBJECT:', subject)
+        print('PROMPT:', prompt)
+
         with client.responses.stream(
             model="gpt-5-mini",
             input=prompt,
@@ -108,6 +112,7 @@ def generate_and_send_email_from_file(job_file_path):
 # Worker loop
 # -----------------------------
 def worker_loop():
+    print('Worker thread started')
     while True:
         for fname in os.listdir(PENDING_DIR):
             src = os.path.join(PENDING_DIR, fname)
@@ -238,11 +243,3 @@ pwdEl.addEventListener("change", load);
 </body>
 </html>
 """
-
-# -----------------------------
-# Main
-# -----------------------------
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    print(f"[STARTUP] Flask sur {port}")
-    app.run(host="0.0.0.0", port=port, threaded=True, use_reloader=False)
