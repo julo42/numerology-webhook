@@ -14,6 +14,8 @@ app = Flask(__name__)
 GMAIL_USER = os.environ.get("SENDER_EMAIL")
 GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD")
 
+NUM_THREADS = 5  # nombre de threads worker
+
 # OpenAI client
 client = OpenAI()
 
@@ -38,11 +40,6 @@ for f in os.listdir(PROCESSING_DIR):
         os.remove(src)
 
 print(f"[STARTUP] Worker prêt. Pending jobs : {len(os.listdir(PENDING_DIR))}")
-
-NUM_THREADS = 2  # nombre de threads worker
-for _ in range(NUM_THREADS):
-    t = threading.Thread(target=worker_loop, daemon=True)
-    t.start()
 
 
 # -----------------------------
@@ -189,5 +186,9 @@ def send_report():
 # Main : démarrage threads + Flask
 # -----------------------------
 if __name__ == "__main__":
+    for _ in range(NUM_THREADS):
+        t = threading.Thread(target=worker_loop, daemon=True)
+        t.start()
+
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
