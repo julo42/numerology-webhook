@@ -44,11 +44,19 @@ for f in os.listdir(PROCESSING_DIR):
 
 print(f"Pending jobs: {len(os.listdir(PENDING_DIR))}")
 
+
+# Permet de renvoyer un propmt avec des valeurs non interprétées
+class SilentDict(dict):
+    def __missing__(self, k):
+        return '{' + k + '}'
+
+
 # -----------------------------
 # Auth helper
 # -----------------------------
 def check_admin_auth(req):
     return req.headers.get("X-Admin-Password") == ADMIN_PASSWORD
+
 
 # -----------------------------
 # Job processing
@@ -59,15 +67,15 @@ def generate_and_send_email_from_file(job_file_path):
             data = json.load(f)
 
         email = data["email"]
-        fields = data["fields"]
+        fields = SilentDict(data["fields"])
 
         print(f"Generating report for {email}")
 
         with open(SUBJECT_FILE, "r", encoding="utf-8") as f:
-            subject = f.read().format(**fields)
+            subject = f.read().format_map(fields)
 
         with open(PROMPT_FILE, "r", encoding="utf-8") as f:
-            prompt = f.read().format(**fields)
+            prompt = f.read().format_map(fields)
 
         guidance_text = ""
 
