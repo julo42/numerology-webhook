@@ -62,54 +62,52 @@ def check_admin_auth(req):
 # Job processing
 # -----------------------------
 def generate_and_send_email_from_file(job_file_path):
-    try:
-        with open(job_file_path, "r", encoding="utf-8") as f:
-            data = json.load(f)
+    with open(job_file_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
 
-        email = data["email"]
-        fields = SilentDict(data["fields"])
+    email = data["email"]
+    fields = SilentDict(data["fields"])
 
-        print(f"Generating report for: {data}")
+    print(f"Generating report for: {email}")
 
-        with open(SUBJECT_FILE, "r", encoding="utf-8") as f:
-            subject = f.read().format_map(fields)
+    with open(SUBJECT_FILE, "r", encoding="utf-8") as f:
+        subject = f.read().format_map(fields)
 
-        with open(PROMPT_FILE, "r", encoding="utf-8") as f:
-            prompt = f.read().format_map(fields)
+    with open(PROMPT_FILE, "r", encoding="utf-8") as f:
+        prompt = f.read().format_map(fields)
 
-        guidance_text = ""
+    guidance_text = ""
 
-        with client.responses.stream(
-            model="gpt-5-mini",
-            input=prompt,
-            reasoning={"effort": "medium"},
-        ) as stream:
-            for event in stream:
-                if event.type == "response.output_text.delta":
-                    guidance_text += event.delta
+    with client.responses.stream(
+        model="gpt-5-mini",
+        input=prompt,
+        reasoning={"effort": "medium"},
+    ) as stream:
+        for event in stream:
+            if event.type == "response.output_text.delta":
+                guidance_text += event.delta
 
-        msg = EmailMessage()
-        msg["From"] = GMAIL_USER
-        msg["To"] = email
-        msg["Subject"] = subject
-        msg.set_content(guidance_text[:4000])
+    msg = EmailMessage()
+    msg["From"] = GMAIL_USER
+    msg["To"] = email
+    msg["Subject"] = subject
+    msg.set_content(guidance_text[:4000])
 
-        msg.add_alternative(
-            "<html><body style='font-family:Arial'>"
-            + guidance_text.replace("\n", "<br>")
-            + "</body></html>",
-            subtype="html",
-        )
+    msg.add_alternative(
+        "<html><body style='font-family:Arial'>"
+        + guidance_text.replace("\n", "<br>")
+        + "</body></html>",
+        subtype="html",
+    )
 
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-            server.login(GMAIL_USER, GMAIL_APP_PASSWORD)
-            server.send_message(msg)
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+        server.login(GMAIL_USER, GMAIL_APP_PASSWORD)
+        server.send_message(msg)
 
-        print(f"Report sent to {email}")
+    print(f"Report sent to {email}")
 
-    finally:
-        if os.path.exists(job_file_path):
-            os.remove(job_file_path)
+    if os.path.exists(job_file_path):
+        os.remove(job_file_path)
 
 # -----------------------------
 # Worker loop
@@ -146,7 +144,7 @@ def send_report():
 
     with open(job_file, "w", encoding="utf-8") as f:
         json.dump(data, f)
-    print(f'File generated: {job_file}')
+    print(f'File generated: {job_file} ({data})')
 
     return jsonify({"status": "accepted"}), 202
 
