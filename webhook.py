@@ -69,7 +69,7 @@ def generate_and_send_email_from_file(job_file_path):
         email = data["email"]
         fields = SilentDict(data["fields"])
 
-        print(f"Generating report for {email}")
+        print(f"Generating report for: {data}")
 
         with open(SUBJECT_FILE, "r", encoding="utf-8") as f:
             subject = f.read().format_map(fields)
